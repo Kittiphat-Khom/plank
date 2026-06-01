@@ -198,18 +198,6 @@ function BrandPanel() {
           ))}
         </div>
       </div>
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: 13 }}>
-        <div style={{ display: 'flex' }}>
-          {TEAM.map((m, i) => (
-            <div key={i} style={{ marginLeft: i ? -9 : 0, width: 32, height: 32, borderRadius: '50%', background: m.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, boxShadow: '0 0 0 2px var(--accent)' }}>
-              {m.initials}
-            </div>
-          ))}
-        </div>
-        <div style={{ fontSize: 13, opacity: 0.86, lineHeight: 1.4 }}>
-          Joined by <b style={{ fontWeight: 750 }}>12,000+</b> builders<br />shipping faster together.
-        </div>
-      </div>
     </div>
   );
 }
@@ -358,10 +346,6 @@ function AuthForm() {
       <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
         <button type="button" className="auth-social-btn" onClick={signInWithGoogle}>
           <Ico name="google" size={18} stroke={0} /> Google
-        </button>
-        <button type="button" className="auth-social-btn"
-          onClick={() => setApiError('SSO requires enterprise plan.')}>
-          <Ico name="bolt" size={17} /> SSO
         </button>
       </div>
 
