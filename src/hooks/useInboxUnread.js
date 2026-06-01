@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 function getLastRead(peerId) {
   const val = localStorage.getItem(`plank_dm_read_${peerId}`);
@@ -17,7 +18,6 @@ export function useInboxUnread(currentUserId) {
 
     // Initial load
     (async () => {
-      const { supabase } = await import('../lib/supabase');
       const { data } = await supabase
         .from('direct_messages')
         .select('id, from_id, to_id, created_at')
@@ -37,27 +37,23 @@ export function useInboxUnread(currentUserId) {
     })();
 
     // Realtime — only care about messages sent TO me
-    let sub;
-    (async () => {
-      const { supabase } = await import('../lib/supabase');
-      sub = supabase
-        .channel('inbox-unread-badge')
-        .on('postgres_changes', {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'direct_messages',
-        }, (payload) => {
-          const msg = payload.new;
-          if (msg.to_id !== currentUserId) return;
-          const peer = msg.from_id;
-          if (new Date(msg.created_at) > getLastRead(peer)) {
-            setCounts((prev) => ({ ...prev, [peer]: (prev[peer] ?? 0) + 1 }));
-          }
-        })
-        .subscribe();
-    })();
+    const channel = supabase
+      .channel(`inbox-unread-badge-${currentUserId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'direct_messages',
+      }, (payload) => {
+        const msg = payload.new;
+        if (msg.to_id !== currentUserId) return;
+        const peer = msg.from_id;
+        if (new Date(msg.created_at) > getLastRead(peer)) {
+          setCounts((prev) => ({ ...prev, [peer]: (prev[peer] ?? 0) + 1 }));
+        }
+      })
+      .subscribe();
 
-    return () => { sub?.unsubscribe(); };
+    return () => { supabase.removeChannel(channel); };
   }, [currentUserId]);
 
   const total = Object.values(counts).reduce((s, n) => s + n, 0);

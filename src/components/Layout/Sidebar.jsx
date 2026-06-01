@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import './sidebar.css';
+import { showToast } from '../../lib/toast';
 import { usePresence } from '../../providers/PresenceProvider';
 import { Icon, Avatar } from '../Global';
 import { ROLE_COLOR } from '../../hooks/usePermissions';
@@ -53,22 +54,39 @@ export function ProjectSettingsModal({ project, onClose }) {
   };
 
   const copyInviteLink = async () => {
-    const { supabase: sb } = await import('../../lib/supabase');
-    // Reuse existing link or create new one
-    const { data: existing } = await sb.from('project_invite_links')
-      .select('token').eq('project_id', project.id).limit(1).single();
-    let token = existing?.token;
-    if (!token) {
-      const { data } = await sb.from('project_invite_links')
-        .insert({ project_id: project.id, role: 'member', created_by: currentUser?.id ?? null })
-        .select('token').single();
-      token = data?.token;
+    try {
+      const { supabase: sb } = await import('../../lib/supabase');
+      const { data: existing } = await sb.from('project_invite_links')
+        .select('token').eq('project_id', project.id).limit(1).maybeSingle();
+      let token = existing?.token;
+      if (!token) {
+        const { data, error } = await sb.from('project_invite_links')
+          .insert({ project_id: project.id, role: 'member', created_by: currentUser?.id ?? null })
+          .select('token').single();
+        if (error) throw error;
+        token = data?.token;
+      }
+      if (!token) throw new Error('Failed to generate invite token');
+      const url = `${window.location.origin}?join=${token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        // fallback for non-secure context
+        const el = document.createElement('textarea');
+        el.value = url;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      }
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2500);
+    } catch (err) {
+      console.error('copyInviteLink failed:', err);
+      showToast('Failed to copy invite link', 'error');
     }
-    if (!token) return;
-    const url = `${window.location.origin}?join=${token}`;
-    await navigator.clipboard.writeText(url);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2500);
   };
 
   const sendInvite = async () => {
