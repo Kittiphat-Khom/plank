@@ -1,0 +1,195 @@
+/* ── Card ────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  padding: var(--card-pad);
+  touch-action: none;
+  user-select: none;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.12s, border-color 0.15s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+.card[data-priority="low"]    { border-color: var(--c-gray); }
+.card[data-priority="med"]    { border-color: var(--c-blue); }
+.card[data-priority="high"]   { border-color: var(--c-orange); }
+.card[data-priority="urgent"] { border-color: var(--c-red); }
+.card[data-ghost="true"] {
+  box-shadow: var(--shadow-drag);
+  cursor: grabbing;
+  transform: rotate(2.2deg) scale(1.02);
+  transition: none;
+  will-change: transform;
+}
+.card[data-ghost="true"]:hover {
+  border-color: var(--border);
+  box-shadow: var(--shadow-drag);
+}
+.card[data-flashing="true"] {
+  animation: flash-bg 1.2s ease-out;
+}
+
+/* ── Cover ───────────────────────────────────────────────────── */
+.card__cover {
+  margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 10px;
+  height: 110px;
+  overflow: hidden;
+}
+.card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Labels ──────────────────────────────────────────────────── */
+.card__labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 7px;
+}
+
+/* ── Title ───────────────────────────────────────────────────── */
+.card__title-row {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+.card__title-flag {
+  margin-top: 2px;
+}
+.card__title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+[data-density="dense"] .card__title {
+  font-size: 13px;
+}
+
+/* ── Typing ──────────────────────────────────────────────────── */
+.card__typing {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 2.5px;
+  align-items: center;
+}
+.typing-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: typing-bounce 1s infinite ease-in-out;
+}
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* ── Meta ────────────────────────────────────────────────────── */
+.card__meta {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 9px;
+  flex-wrap: wrap;
+}
+.card__comment-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-faint);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.card__points {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Subtask Progress ────────────────────────────────────────── */
+.subtask-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.subtask-progress[data-complete="true"] {
+  color: var(--c-green);
+}
+.subtask-progress__bar {
+  position: relative;
+  width: 26px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--border-strong);
+  overflow: hidden;
+}
+.subtask-progress__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: 99px;
+  background: var(--accent);
+  transition: width 0.25s;
+}
+.subtask-progress[data-complete="true"] .subtask-progress__fill {
+  background: var(--c-green);
+}
+
+/* ── Footer ──────────────────────────────────────────────────── */
+.card__footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.card__meta + .card__footer {
+  margin-top: 9px;
+}
+.card__key {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+.card__assignees {
+  margin-left: auto;
+}
+
+/* ── Sync Indicator ──────────────────────────────────────────── */
+.card__sync {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}

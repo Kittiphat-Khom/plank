@@ -1,0 +1,256 @@
+/* ── Topbar ──────────────────────────────────────────────────── */
+.topbar {
+  height: var(--topbar-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px 0 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.topbar__spacer {
+  flex: 1;
+}
+.topbar__divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.topbar__title-group {
+  min-width: 0;
+}
+.topbar__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.topbar__title {
+  font-size: 15.5px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar__view-wrap {
+  margin-left: 6px;
+}
+
+/* ── Menu button (mobile) ────────────────────────────────────── */
+.menu-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+.menu-btn:hover {
+  background: var(--surface-hover);
+}
+
+/* ── View Switcher ───────────────────────────────────────────── */
+.view-switcher {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-sunken);
+  border-radius: 9px;
+  padding: 3px;
+  border: 1px solid var(--border);
+}
+.view-switcher__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text-muted);
+  background: transparent;
+  transition: background 0.12s, color 0.12s;
+}
+.view-switcher__btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+.view-switcher__btn[data-active="true"] {
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--shadow-xs);
+}
+.view-switcher__btn[data-active="true"]:hover {
+  background: var(--surface);
+}
+
+/* ── Search ──────────────────────────────────────────────────── */
+.topbar__search {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-faint);
+  font-size: 12.5px;
+  width: 170px;
+  transition: border-color 0.12s;
+}
+.topbar__search:hover {
+  border-color: var(--border-strong);
+}
+.topbar__search-label {
+  flex: 1;
+  text-align: left;
+}
+
+/* ── New Card Button ─────────────────────────────────────────── */
+.topbar__new-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 650;
+  font-size: 13px;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.12s;
+}
+.topbar__new-btn:hover {
+  background: var(--accent-hover);
+}
+
+.topbar__share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 13px;
+  transition: background 0.12s, color 0.12s;
+}
+.topbar__share-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+}
+
+/* ── Filter ──────────────────────────────────────────────────── */
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s;
+}
+.filter-btn:hover {
+  background: var(--surface-hover);
+}
+.filter-btn[data-active="true"] {
+  background: var(--accent-soft);
+  color: var(--accent-text);
+}
+.filter-btn__badge {
+  background: var(--accent);
+  color: var(--text-on-accent);
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 5px;
+  min-width: 15px;
+  text-align: center;
+}
+
+/* ── Group ───────────────────────────────────────────────────── */
+.group-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  transition: background 0.12s;
+}
+.group-btn:hover {
+  background: var(--surface-hover);
+}
+
+/* ── Filter Popover ──────────────────────────────────────────── */
+.filter-popover {
+  padding: 4px 6px;
+}
+.filter-section-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-faint);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 8px 8px 4px;
+}
+.filter-label-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 2px 8px 8px;
+}
+.filter-label-btn {
+  background: transparent;
+  transition: opacity 0.12s;
+}
+.filter-priority-row {
+  display: flex;
+  gap: 5px;
+  padding: 2px 8px 8px;
+}
+.filter-priority-btn {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color 0.12s, background 0.12s;
+}
+.filter-priority-btn[data-active="true"] {
+  border-color: var(--pc);
+  background: color-mix(in oklch, var(--pc) 12%, var(--surface));
+}
+.filter-due-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.filter-clear-btn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 7px 0;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+  transition: background 0.12s;
+}
+.filter-clear-btn:hover {
+  background: var(--border);
+}

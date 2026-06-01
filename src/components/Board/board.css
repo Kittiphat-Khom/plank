@@ -1,0 +1,140 @@
+/* ── Board ───────────────────────────────────────────────────── */
+.board {
+  flex: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px 8px;
+  align-items: stretch;
+}
+.board__ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9000;
+  will-change: transform;
+}
+
+/* ── Column ──────────────────────────────────────────────────── */
+.col {
+  width: var(--col-w);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 10px 10px 6px;
+}
+
+/* ── Column Header ───────────────────────────────────────────── */
+.col__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.col__accent-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.col__name {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.col__count {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
+  flex-shrink: 0;
+}
+.col__wip {
+  margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+  color: var(--text-faint);
+  background: var(--surface-hover);
+}
+.col__wip[data-over="true"] {
+  color: var(--c-red);
+  background: color-mix(in oklch, var(--c-red) 14%, transparent);
+}
+
+/* ── Column List ─────────────────────────────────────────────── */
+.col__list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 3px 4px 8px;
+  margin: 0 -4px;
+  border-radius: var(--r-lg);
+  min-height: 60px;
+  background: transparent;
+  outline: 2px dashed transparent;
+  outline-offset: -2px;
+  transition: background 0.15s, outline-color 0.15s;
+}
+.col__list[data-drop-target="true"] {
+  background: color-mix(in oklch, var(--accent) 6%, transparent);
+  outline-color: var(--accent-soft-border);
+}
+
+/* ── Placeholder ─────────────────────────────────────────────── */
+.col__placeholder {
+  border-radius: var(--r-md);
+  background: color-mix(in oklch, var(--accent) 11%, transparent);
+  border: 1.5px dashed var(--accent-soft-border);
+  flex-shrink: 0;
+  animation: pop-in 0.12s ease-out;
+}
+
+/* ── Add Card ────────────────────────────────────────────────── */
+.col__add-wrap {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--accent-soft-border);
+  padding: 8px;
+  box-shadow: var(--shadow-sm);
+}
+.col__add-textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
+}
+.col__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 9px;
+  border-radius: var(--r-md);
+  color: var(--text-faint);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.col__add-btn:hover {
+  background: var(--surface-hover);
+  color: var(--text-muted);
+}
