@@ -15,9 +15,8 @@ const CARD_SELECT = `
 `;
 
 export async function fetchAllCards(projectId) {
-  let query = supabase.from('cards').select(CARD_SELECT).order('position');
-  if (projectId) query = query.eq('project_id', projectId);
-  const { data, error } = await query;
+  if (!projectId) return [];
+  const { data, error } = await supabase.from('cards').select(CARD_SELECT).eq('project_id', projectId).order('position');
   if (error) { console.error('fetchAllCards:', error); return []; }
   return data.map(transformCard);
 }
