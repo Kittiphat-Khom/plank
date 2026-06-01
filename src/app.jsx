@@ -327,6 +327,26 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Handle ?join=TOKEN — add current user to project after login
+  useEffect(() => {
+    const token = new URLSearchParams(window.location.search).get('join');
+    if (!token || !currentUser?.id) return;
+    (async () => {
+      const { data: link } = await supabase
+        .from('project_invite_links')
+        .select('project_id, role')
+        .eq('token', token)
+        .single();
+      if (!link) return;
+      await supabase.from('project_members').upsert(
+        { project_id: link.project_id, member_id: currentUser.id, role: link.role },
+        { onConflict: 'project_id,member_id' }
+      );
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    })();
+  }, [currentUser?.id]);
+
   if (session === undefined) {
     return (
       <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
