@@ -161,7 +161,7 @@ function BrandPanel() {
   return (
     <div className="auth-brand" style={{
       position: 'relative', overflow: 'hidden', padding: '44px 48px',
-      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+      display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 40,
       background: 'linear-gradient(155deg, var(--accent) 0%, oklch(0.42 0.16 285) 100%)', color: '#fff',
     }}>
       <div aria-hidden="true" style={{ position: 'absolute', inset: 0, opacity: 0.13, pointerEvents: 'none' }}>
@@ -176,7 +176,7 @@ function BrandPanel() {
           ))}
         </svg>
       </div>
-      <div style={{ position: 'relative', zIndex: 1 }}><Logo size={34} light /></div>
+      <div style={{ position: 'absolute', top: 44, left: 48, zIndex: 2 }}><Logo size={34} light /></div>
       <div style={{ position: 'relative', zIndex: 1 }}>
         <h1 style={{ fontSize: 34, lineHeight: 1.12, fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 14, textWrap: 'balance' }}>
           Where your team's work clicks into place.
@@ -184,7 +184,7 @@ function BrandPanel() {
         <p style={{ fontSize: 15, lineHeight: 1.55, opacity: 0.86, maxWidth: 380, marginBottom: 32 }}>
           The real-time workspace for software teams — boards, sprints, and bugs that everyone can move together.
         </p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18, textAlign: 'left' }}>
           {FEATURES.map((f) => (
             <div key={f.title} style={{ display: 'flex', gap: 13, alignItems: 'flex-start' }}>
               <div style={{ width: 38, height: 38, borderRadius: 11, background: 'rgba(255,255,255,0.16)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, backdropFilter: 'blur(4px)' }}>
@@ -217,7 +217,7 @@ function AuthForm() {
   const [touched, setTouched]   = useState({});
   const [loading, setLoading]   = useState(false);
   const [apiError, setApiError] = useState('');
-  // 'idle' | 'success' | 'confirm_email'
+  // 'idle' | 'success' | 'confirm_email' | 'forgot' | 'forgot_sent'
   const [status, setStatus]     = useState('idle');
 
   const isReg = mode === 'register';
@@ -321,6 +321,87 @@ function AuthForm() {
     );
   }
 
+  if (status === 'forgot') {
+    const sendReset = async () => {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}?reset=1`,
+      });
+      setLoading(false);
+      if (error) { setApiError(error.message); return; }
+      setStatus('forgot_sent');
+    };
+
+    return (
+      <div style={{ animation: 'fade-in .3s' }}>
+        {/* Icon */}
+        <div style={{ width: 52, height: 52, borderRadius: 14, background: 'var(--accent-soft)', border: '1.5px solid var(--accent-soft-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+          <Ico name="lock" size={24} stroke={1.8} style={{ color: 'var(--accent-text)' }} />
+        </div>
+
+        <h2 style={{ fontSize: 23, fontWeight: 800, letterSpacing: '-0.025em', marginBottom: 6 }}>Forgot your password?</h2>
+        <p style={{ fontSize: 13.5, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 26 }}>
+          No worries — enter your email and we'll send you a reset link right away.
+        </p>
+
+        <Field
+          icon="mail" type="email" label="Email address"
+          value={email} onChange={(v) => { setEmail(v); setApiError(''); }}
+          placeholder="you@example.com" autoComplete="email"
+          error={apiError}
+        />
+
+        <button
+          type="button"
+          disabled={loading || !validateEmail(email)}
+          onClick={sendReset}
+          style={{
+            width: '100%', height: 46, marginTop: 18, borderRadius: 11,
+            background: validateEmail(email) ? 'var(--accent)' : 'var(--surface-hover)',
+            color: validateEmail(email) ? '#fff' : 'var(--text-faint)',
+            fontSize: 14.5, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9,
+            border: 'none', cursor: validateEmail(email) && !loading ? 'pointer' : 'default',
+            transition: 'background .15s, opacity .15s',
+            opacity: loading ? 0.7 : 1,
+          }}
+        >
+          {loading ? 'Sending…' : 'Send reset link'}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { setStatus('idle'); setApiError(''); }}
+          style={{ width: '100%', height: 40, marginTop: 10, borderRadius: 11, background: 'transparent', border: '1.5px solid var(--border)', color: 'var(--text-muted)', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', transition: 'background .15s' }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-hover)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+        >
+          Back to sign in
+        </button>
+      </div>
+    );
+  }
+
+  if (status === 'forgot_sent') {
+    return (
+      <div style={{ textAlign: 'center', animation: 'pop-in .3s ease-out' }}>
+        <div style={{ width: 60, height: 60, borderRadius: 18, background: 'var(--accent-soft)', border: '1.5px solid var(--accent-soft-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 18px' }}>
+          <Ico name="mail2" size={28} stroke={1.8} style={{ color: 'var(--accent-text)' }} />
+        </div>
+        <h2 style={{ fontSize: 21, fontWeight: 750, letterSpacing: '-0.02em', marginBottom: 8 }}>Check your inbox</h2>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 20 }}>
+          We sent a reset link to<br />
+          <b style={{ color: 'var(--text)', fontWeight: 650 }}>{email}</b>
+        </p>
+        <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>
+          <button type="button" onClick={() => switchMode('login')} style={{ color: 'var(--accent-text)', fontWeight: 650 }}>
+            Back to sign in
+          </button>
+        </p>
+      </div>
+    );
+  }
+
   // ── Form ──────────────────────────────────────────────────
   return (
     <form onSubmit={submit} noValidate style={{ animation: 'fade-in .3s' }}>
@@ -386,7 +467,7 @@ function AuthForm() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
           <Checkbox checked={remember} onChange={setRemember} label="Remember me" />
           <button type="button" style={{ fontSize: 13, fontWeight: 650, color: 'var(--accent-text)' }}
-            onClick={() => alert('Password reset coming soon.')}>
+            onClick={() => { setApiError(''); setStatus('forgot'); }}>
             Forgot password?
           </button>
         </div>
