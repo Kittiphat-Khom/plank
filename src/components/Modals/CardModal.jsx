@@ -447,6 +447,8 @@ export function CardModal({ cardId, onClose, draft = false, onCreated }) {
   const [saving,         setSaving]         = useState(false);
 
   const imageInputRef2 = useRef();
+  const titleTextareaRef = useRef(null);
+  useEffect(() => { if (draft && titleTextareaRef.current) titleTextareaRef.current.focus(); }, []);
 
   async function handleDraftCreate() {
     if (!draftTitle.trim() || saving) return;
@@ -554,7 +556,7 @@ if (!draft && !card) return null;
               rows={1}
               style={{ ...S.titleInput, ...(draft ? { border: '1px solid var(--border)', borderRadius: 'var(--r-md)', padding: '10px 12px', marginBottom: 16, background: 'var(--surface)', overflow: 'hidden', fontSize: 18 } : {}) }}
               onInput={(e) => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
-              ref={(el) => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; if (draft) el.focus(); } }}
+              ref={(el) => { titleTextareaRef.current = el; if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }}
             />
 
             <SectionLabel icon="list" text="Description" />
