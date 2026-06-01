@@ -29,6 +29,35 @@ import { onToast } from './lib/toast';
 import { AuthPage } from './components/Auth/AuthPage';
 import { supabase } from './lib/supabase';
 
+function JoinProjectModal({ projectName, role, onConfirm, onCancel }) {
+  const [joining, setJoining] = useState(false);
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9000, background: 'oklch(0.2 0.02 264 / 0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ width: 400, background: 'var(--bg)', borderRadius: 'var(--r-xl)', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', padding: 32, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
+        <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--accent-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🔗</div>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 6 }}>You've been invited</div>
+          <div style={{ fontSize: 14, color: 'var(--text-muted)' }}>
+            Join <strong>{projectName}</strong> as <strong>{role}</strong>?
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 10, width: '100%' }}>
+          <button onClick={onCancel} style={{ flex: 1, padding: '9px 0', borderRadius: 'var(--r-md)', fontSize: 14, fontWeight: 600, background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer' }}>
+            Decline
+          </button>
+          <button
+            onClick={async () => { setJoining(true); await onConfirm(); setJoining(false); }}
+            disabled={joining}
+            style={{ flex: 1, padding: '9px 0', borderRadius: 'var(--r-md)', fontSize: 14, fontWeight: 600, background: 'var(--accent)', color: '#fff', border: 'none', cursor: joining ? 'default' : 'pointer', opacity: joining ? 0.7 : 1 }}
+          >
+            {joining ? 'Joining…' : 'Join project'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const TWEAK_DEFAULTS = { accentHue: 264, theme: "light", density: "regular", defaultView: "kanban", showCursors: true };
 
 const ACCENTS = [
@@ -90,6 +119,7 @@ function Workspace() {
   const [draftOpen, setDraftOpen]           = useState(false);
   const [shareOpen, setShareOpen]           = useState(false);
   const [toast, setToast]                   = useState(null);
+  const [joinPrompt, setJoinPrompt]         = useState(null); // { projectName, projectId, role, token }
   const { total: inboxBadge, markRead: markDmRead } = useInboxUnread(plank.currentUserId);
 
   useEffect(() => {
@@ -200,6 +230,21 @@ function Workspace() {
         </div>
       </main>
 
+      {joinPrompt && (
+        <JoinProjectModal
+          projectName={joinPrompt.projectName}
+          role={joinPrompt.role}
+          onConfirm={async () => {
+            await supabase.from('project_members').upsert(
+              { project_id: joinPrompt.projectId, member_id: currentUser.id, role: joinPrompt.role },
+              { onConflict: 'project_id,member_id' }
+            );
+            setJoinPrompt(null);
+            plank.reset();
+          }}
+          onCancel={() => setJoinPrompt(null)}
+        />
+      )}
       {draftOpen && <CardModal draft onClose={() => setDraftOpen(false)} onCreated={() => setDraftOpen(false)} />}
       {openCardId && <CardModal cardId={openCardId} onClose={() => setOpenCardId(null)} />}
       {shareOpen && plank.project && <ProjectSettingsModal project={plank.project} onClose={() => setShareOpen(false)} />}
@@ -327,22 +372,23 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle ?join=TOKEN — add current user to project after login
+  // Handle ?join=TOKEN — show confirmation UI before joining
   useEffect(() => {
     const token = new URLSearchParams(window.location.search).get('join');
     if (!token || !currentUser?.id) return;
     (async () => {
       const { data: link } = await supabase
         .from('project_invite_links')
-        .select('project_id, role')
+        .select('project_id, role, projects(name)')
         .eq('token', token)
         .single();
       if (!link) return;
-      await supabase.from('project_members').upsert(
-        { project_id: link.project_id, member_id: currentUser.id, role: link.role },
-        { onConflict: 'project_id,member_id' }
-      );
-      // Clean URL
+      setJoinPrompt({
+        projectName: link.projects?.name ?? 'Unknown project',
+        projectId: link.project_id,
+        role: link.role,
+        token,
+      });
       window.history.replaceState({}, '', window.location.pathname);
     })();
   }, [currentUser?.id]);
