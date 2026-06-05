@@ -573,7 +573,7 @@ if (!draft && !card) return null;
             />
 
 
-            <AiPanel card={card} disabled={draft} />
+            <AiPanel card={card} disabled={draft || !perms.canEdit} />
 
             {/* Subtasks */}
             <div style={{ marginTop: 18 }}>
@@ -599,7 +599,7 @@ if (!draft && !card) return null;
                     onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                   >
                     <button
-                      onClick={() => toggleSubtask(card.id, s.id)}
+                      onClick={requireEdit(() => toggleSubtask(card.id, s.id))}
                       style={{
                         width: 18,
                         height: 18,
@@ -677,10 +677,10 @@ if (!draft && !card) return null;
                     <div key={i} style={{ position: "relative", borderRadius: "var(--r-md)", overflow: "hidden", aspectRatio: "4/3" }}>
                       <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
                       <button
-                        onClick={() => draft
+                        onClick={requireEdit(() => draft
                           ? setDraftImages((prev) => prev.filter((_, j) => j !== i))
                           : updateCard(card.id, { images: card.images.filter((_, j) => j !== i) })
-                        }
+                        )}
                         style={{ position: "absolute", top: 3, right: 3, width: 18, height: 18, borderRadius: 4, background: "oklch(0 0 0 / 0.55)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}
                       >
                         <Icon name="close" size={11} />
@@ -812,7 +812,7 @@ if (!draft && !card) return null;
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '10px 18px', borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
           <div>
-            {!draft && (
+            {!draft && perms.canEdit && (
               <button
                 onClick={requireEdit(() => { deleteCard(card.id); onClose(); })}
                 style={S.deleteBtn}

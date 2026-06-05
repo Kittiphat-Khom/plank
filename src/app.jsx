@@ -25,9 +25,20 @@ function DueSoonView({ onOpen, groupBy }) {
 import { useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakRadio } from './tweaks';
 import { ProjectSetup } from './components/Setup/ProjectSetup';
 import { LiveCursors } from './components/Modals/LiveCursors';
-import { onToast } from './lib/toast';
+import { onToast, showToast } from './lib/toast';
 import { AuthPage } from './components/Auth/AuthPage';
 import { supabase } from './lib/supabase';
+import { usePermissions } from './hooks/usePermissions';
+
+const GUEST_USER = {
+  id: 'guest_viewer',
+  name: 'Guest Viewer',
+  handle: 'guest',
+  initials: 'GV',
+  color: 'var(--text-faint)',
+  role: 'viewer',
+  isGuest: true,
+};
 
 function JoinProjectModal({ projectName, role, onConfirm, onCancel }) {
   const [joining, setJoining] = useState(false);
@@ -102,8 +113,9 @@ function buildFilterFn(filters, search) {
   };
 }
 
-function Workspace() {
+function Workspace({ onExitGuest }) {
   const plank = usePlank();
+  const perms = usePermissions();
 
   // ── All hooks must be called unconditionally ─────────────
   const [t, setTweak]               = useTweaks(TWEAK_DEFAULTS);
@@ -135,7 +147,24 @@ function Workspace() {
 
   const filterFn = useMemo(() => buildFilterFn(filters, search), [filters, search]);
 
-  const newCard = useCallback(() => { setDraftOpen(true); }, []);
+  const promptSignIn = useCallback((message = 'Sign in to edit this demo workspace') => {
+    showToast(message, 'error');
+  }, []);
+
+  const newCard = useCallback(() => {
+    if (!perms.canCreate) { promptSignIn(); return; }
+    setDraftOpen(true);
+  }, [perms.canCreate, promptSignIn]);
+
+  const openShare = useCallback(() => {
+    if (plank.isGuest) { promptSignIn('Sign in to invite teammates'); return; }
+    setShareOpen(true);
+  }, [plank.isGuest, promptSignIn]);
+
+  const openNewProject = useCallback(() => {
+    if (plank.isGuest) { promptSignIn('Sign in to create projects'); return; }
+    setNewProjectOpen(true);
+  }, [plank.isGuest, promptSignIn]);
 
   const actions = useMemo(() => [
     { id: "v_kanban", icon: "kanban",   title: "Go to Board view",    shortcut: "B", run: () => setView("kanban") },
@@ -186,7 +215,7 @@ function Workspace() {
   return (
     <div className="app-shell" data-menu={menuOpen ? "open" : "closed"}>
       <div className="sidebar-wrap">
-        <Sidebar onOpenCmd={() => setCmdOpen(true)} onClose={() => setMenuOpen(false)} onNewProject={() => setNewProjectOpen(true)} view={view} onSetView={setView} inboxBadge={inboxBadge} />
+        <Sidebar onOpenCmd={() => setCmdOpen(true)} onClose={() => setMenuOpen(false)} onNewProject={openNewProject} view={view} onSetView={setView} inboxBadge={inboxBadge} onSignIn={onExitGuest} />
       </div>
       {menuOpen && <div className="sidebar-scrim" onClick={() => setMenuOpen(false)} />}
 
@@ -201,7 +230,9 @@ function Workspace() {
           activityOpen={activityOpen}
           onToggleMenu={() => setMenuOpen((v) => !v)}
           onNewCard={newCard}
-          onShare={() => setShareOpen(true)}
+          onShare={openShare}
+          isGuest={plank.isGuest}
+          onSignIn={onExitGuest}
         />
 
         <div className="app-content">
@@ -345,11 +376,13 @@ export default function App() {
   // undefined = loading, null = not authed, object = session
   const [session, setSession]           = useState(undefined);
   const [currentUser, setCurrentUser]   = useState(null);
+  const [guestMode, setGuestMode]       = useState(false);
 
   useEffect(() => {
     async function handleSession(session) {
       setSession(session ?? null);
       if (session?.user) {
+        setGuestMode(false);
         try {
           const member = await upsertCurrentUser(session.user);
           setCurrentUser(member);
@@ -407,7 +440,7 @@ export default function App() {
     );
   }
 
-  if (!session) return <AuthPage />;
+  if (!session && !guestMode) return <AuthPage onContinueAsGuest={() => setGuestMode(true)} />;
 
   // name has no space = auto-generated from email, prompt user to set real name
   const needsProfile = currentUser && !/\s/.test(currentUser.name.trim());
@@ -422,9 +455,9 @@ export default function App() {
   }
 
   return (
-    <PlankProvider currentUser={currentUser}>
-      <PresenceProvider currentUser={currentUser}>
-        <Workspace />
+    <PlankProvider currentUser={guestMode ? GUEST_USER : currentUser}>
+      <PresenceProvider currentUser={guestMode ? GUEST_USER : currentUser}>
+        <Workspace onExitGuest={() => setGuestMode(false)} />
       </PresenceProvider>
     </PlankProvider>
   );

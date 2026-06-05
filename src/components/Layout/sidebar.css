@@ -208,8 +208,14 @@
   position: relative;
   transition: opacity .15s;
 }
+.project-row[data-readonly="true"] {
+  cursor: pointer;
+}
 .project-row:active {
   cursor: grabbing;
+}
+.project-row[data-readonly="true"]:active {
+  cursor: pointer;
 }
 .project-row[data-drop-above="true"]::before {
   content: '';

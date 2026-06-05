@@ -137,7 +137,7 @@ function FilterPopover({ filters, setFilters }) {
 }
 
 // ── Topbar ────────────────────────────────────────────────────
-export function Topbar({ view, setView, filters, setFilters, groupBy, setGroupBy, onOpenCmd, onToggleActivity, activityOpen, onToggleMenu, onNewCard, onShare }) {
+export function Topbar({ view, setView, filters, setFilters, groupBy, setGroupBy, onOpenCmd, onToggleActivity, activityOpen, onToggleMenu, onNewCard, onShare, isGuest, onSignIn }) {
   const presence = usePresence();
   const { project } = usePlank();
   const groupRef = useRef();
@@ -191,6 +191,16 @@ export function Topbar({ view, setView, filters, setFilters, groupBy, setGroupBy
       <div className="topbar__divider" />
 
       <IconButton name="bell" title="Activity feed" active={activityOpen} onClick={onToggleActivity} />
+
+      {isGuest && (
+        <button
+          onClick={onSignIn}
+          className="topbar__guest-btn"
+          title="Sign in to edit this workspace"
+        >
+          Guest viewer
+        </button>
+      )}
 
       <button onClick={onShare} className="topbar__share-btn" title="Invite members">
         <Icon name="user" size={14} />

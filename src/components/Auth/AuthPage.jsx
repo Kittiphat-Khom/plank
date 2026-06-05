@@ -205,7 +205,7 @@ function BrandPanel() {
 // ── Auth Form ─────────────────────────────────────────────────
 function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
-function AuthForm() {
+function AuthForm({ onContinueAsGuest }) {
   const [mode, setMode]         = useState(() => location.hash.replace('#', '') === 'register' ? 'register' : 'login');
   const [name, setName]         = useState('');
   const [email, setEmail]       = useState('');
@@ -502,6 +502,26 @@ function AuthForm() {
         {loading ? <Spinner /> : <>{isReg ? 'Create account' : 'Sign in'} <Ico name="arrowRight" size={17} stroke={2.3} /></>}
       </button>
 
+      {!isReg && (
+        <button
+          type="button"
+          onClick={onContinueAsGuest}
+          style={{
+            width: '100%',
+            height: 42,
+            marginTop: 10,
+            borderRadius: 11,
+            border: '1.5px solid var(--border)',
+            background: 'var(--surface)',
+            color: 'var(--text)',
+            fontSize: 14,
+            fontWeight: 700,
+          }}
+        >
+          Continue as guest <span style={{ color: 'var(--text-faint)', fontWeight: 600 }}>(viewer only)</span>
+        </button>
+      )}
+
       <p style={{ textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', marginTop: 20 }}>
         {isReg ? 'Already have an account? ' : 'New to Plank? '}
         <button type="button" onClick={() => switchMode(isReg ? 'login' : 'register')}
@@ -528,7 +548,7 @@ function ThemeToggle() {
 }
 
 // ── AuthPage ──────────────────────────────────────────────────
-export function AuthPage() {
+export function AuthPage({ onContinueAsGuest }) {
   return (
     <div className="auth-root">
       <ThemeToggle />
@@ -539,7 +559,7 @@ export function AuthPage() {
             <div className="auth-mobile-logo" style={{ display: 'none', marginBottom: 28, justifyContent: 'center' }}>
               <Logo size={32} />
             </div>
-            <AuthForm />
+            <AuthForm onContinueAsGuest={onContinueAsGuest} />
           </div>
         </div>
       </div>

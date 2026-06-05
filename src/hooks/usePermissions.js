@@ -12,8 +12,8 @@ export const ROLE_COLOR = {
 export const ALL_ROLES = ['owner', 'admin', 'member', 'viewer'];
 
 export function usePermissions() {
-  const { memberById, currentUserId } = usePlank();
-  const me = memberById[currentUserId] ?? memberById['u_you'];
+  const { memberById, currentUser, currentUserId } = usePlank();
+  const me = currentUser?.isGuest ? currentUser : (memberById[currentUserId] ?? memberById['u_you']);
   const myRole = me?.role ?? 'viewer';
   const myLevel = ROLE_LEVEL[myRole] ?? 1;
 

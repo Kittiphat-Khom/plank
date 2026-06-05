@@ -503,10 +503,11 @@ function ProfilePopover({ member, anchorRef, open, onClose, onUpdated, onSignOut
   );
 }
 
-export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inboxBadge }) {
+export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inboxBadge, onSignIn }) {
   const presence  = usePresence();
   const plank     = usePlank();
   const { memberById, projects, project, selectProject, deleteProject, reorderProjects, patchMember } = plank;
+  const isGuest = !!plank.isGuest;
   const [settingsProjectId, setSettingsProjectId] = useState(null);
 
   // --- project drag-to-reorder (order from DB via projects prop) ---
@@ -529,17 +530,20 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
     .filter(Boolean);
 
   function handleDragStart(e, idx) {
+    if (isGuest) { e.preventDefault(); return; }
     dragIdx.current = idx;
     e.dataTransfer.effectAllowed = 'move';
   }
 
   function handleDragOver(e, idx) {
+    if (isGuest) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     if (idx !== dragIdx.current) setDropIdx(idx);
   }
 
   function handleDrop(e, idx) {
+    if (isGuest) return;
     e.preventDefault();
     const from = dragIdx.current;
     if (from === null || from === idx) { setDropIdx(null); return; }
@@ -612,7 +616,8 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
             className="project-row nav-item"
             data-active={p.id === project?.id && ["kanban","list","calendar","timeline"].includes(view) ? "true" : undefined}
             data-drop-above={dropIdx === idx ? "true" : undefined}
-            draggable
+            data-readonly={isGuest ? "true" : undefined}
+            draggable={!isGuest}
             onDragStart={(e) => handleDragStart(e, idx)}
             onDragOver={(e) => handleDragOver(e, idx)}
             onDrop={(e) => handleDrop(e, idx)}
@@ -621,17 +626,19 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
           >
             <span className="nav-item__accent" style={{ background: p.color || 'var(--accent)' }} />
             <span className="nav-item__label" style={{ flex: 1 }}>{p.name}</span>
-            <button
-              className="project-row__settings"
-              title="Project settings"
-              onClick={(e) => { e.stopPropagation(); setSettingsProjectId(p.id); }}
-            >
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-              </svg>
-            </button>
-            {p.owner_id === plank.currentUser?.id && (
+            {!isGuest && (
+              <button
+                className="project-row__settings"
+                title="Project settings"
+                onClick={(e) => { e.stopPropagation(); setSettingsProjectId(p.id); }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </button>
+            )}
+            {!isGuest && p.owner_id === plank.currentUser?.id && (
               <button
                 className="project-row__settings"
                 title="Delete project"
@@ -692,27 +699,29 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
             <div style={{ marginTop: 10, padding: '0 9px' }}>
               <button
                 ref={profileBtnRef}
-                onClick={() => setProfileOpen(o => !o)}
+                onClick={isGuest ? onSignIn : () => setProfileOpen(o => !o)}
                 style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 7, padding: '5px 6px', borderRadius: 8, background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
               >
                 <Avatar member={me} size={22} />
                 <span style={{ fontSize: 12, color: 'var(--text-muted)', flex: 1, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {me.name}
+                  {isGuest ? 'Guest viewer' : me.name}
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 20, borderRadius: 6, border: '1.5px solid var(--accent-soft-border)', background: 'var(--accent-soft)', flexShrink: 0 }}>
-                  <Icon name="settings" size={13} style={{ color: 'var(--accent)' }} />
+                  <Icon name={isGuest ? 'logout' : 'settings'} size={13} style={{ color: 'var(--accent)' }} />
                 </span>
               </button>
-              <ProfilePopover
-                member={me}
-                anchorRef={profileBtnRef}
-                open={profileOpen}
-                onClose={() => setProfileOpen(false)}
-                onUpdated={(updated) => { setLocalUser(updated); patchMember(updated); setProfileOpen(false); }}
-                onSignOut={() => { setProfileOpen(false); setLogoutOpen(true); }}
-              />
+              {!isGuest && (
+                <ProfilePopover
+                  member={me}
+                  anchorRef={profileBtnRef}
+                  open={profileOpen}
+                  onClose={() => setProfileOpen(false)}
+                  onUpdated={(updated) => { setLocalUser(updated); patchMember(updated); setProfileOpen(false); }}
+                  onSignOut={() => { setProfileOpen(false); setLogoutOpen(true); }}
+                />
+              )}
             </div>
           );
         })()}

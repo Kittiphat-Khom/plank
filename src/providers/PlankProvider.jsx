@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, useEffect, useRef, useCallback, 
 import { supabase } from '../lib/supabase';
 import { MEMBERS, LABELS, COLUMNS } from '../config/data';
 import { transformCard } from '../decorators/card';
+import { showToast } from '../lib/toast';
 
 const PlankCtx = createContext(null);
 
@@ -145,6 +146,7 @@ export const nextId = (p) => `${p}_${(++_seq).toString(36)}${Math.random().toStr
 
 // ── Provider ──────────────────────────────────────────────────
 export function PlankProvider({ children, currentUser }) {
+  const isGuest = !!currentUser?.isGuest;
   const emptyState = { byId: {}, cardsByCol: Object.fromEntries(COLUMNS.map((c) => [c.id, []])), activity: [], syncing: {}, ghosted: {} };
   const [state, dispatch] = useReducer(reducer, emptyState);
   const [loading, setLoading]           = useState(true);
@@ -180,10 +182,12 @@ export function PlankProvider({ children, currentUser }) {
   }, []);
 
   const membersWithRoles = useMemo(() => {
-    const dbMap = Object.fromEntries(dbMembers.map((m) => [m.id, m]));
     const merged = [...MEMBERS, ...dbMembers.filter((m) => !MEMBERS.find((s) => s.id === m.id))];
-    return merged.map((m) => ({ ...m, role: memberRoles[m.id] ?? m.role ?? 'member' }));
-  }, [memberRoles, dbMembers]);
+    const withRoles = merged.map((m) => ({ ...m, role: memberRoles[m.id] ?? m.role ?? 'member' }));
+    return currentUser?.isGuest && !withRoles.find((m) => m.id === currentUser.id)
+      ? [...withRoles, currentUser]
+      : withRoles;
+  }, [memberRoles, dbMembers, currentUser]);
 
   const memberById = useMemo(() => Object.fromEntries(membersWithRoles.map((m) => [m.id, m])), [membersWithRoles]);
   const labelById  = useMemo(() => Object.fromEntries(LABELS.map((l) => [l.id, l])), []);
@@ -195,6 +199,15 @@ export function PlankProvider({ children, currentUser }) {
     Promise.all([
       fetchActivity(),
       (async () => {
+        if (currentUser.isGuest) {
+          const { data } = await supabase
+            .from('projects')
+            .select('*')
+            .order('position')
+            .order('created_at')
+            .limit(1);
+          return { data: data ?? [] };
+        }
         const myId = currentUser.id;
         const [{ data: owned }, { data: memberships }] = await Promise.all([
           supabase.from('projects').select('*').eq('owner_id', myId).order('position').order('created_at'),
@@ -220,7 +233,7 @@ export function PlankProvider({ children, currentUser }) {
       setProjectLoading(false);
       if (activeProject) await loadProjectRoles(activeProject.id);
     });
-  }, [currentUser?.id]);
+  }, [currentUser?.id, currentUser?.isGuest]);
 
   useEffect(() => {
     const channel = supabase.channel('plank-realtime')
@@ -250,12 +263,20 @@ export function PlankProvider({ children, currentUser }) {
   }, []);
 
   const logActivity = useCallback(async (who, verb, target, detail = '') => {
+    if (isGuest) return;
     const entry = { id: nextId('a'), who, verb, target, detail, at: new Date().toISOString() };
     dispatch({ type: 'PREPEND_ACTIVITY', entry });
     await supabase.from('activity').insert({ who, verb, target, detail });
-  }, []);
+  }, [isGuest]);
+
+  const blockGuestEdit = useCallback(() => {
+    if (!isGuest) return false;
+    showToast('Sign in to edit this demo workspace', 'error');
+    return true;
+  }, [isGuest]);
 
   const moveCard = useCallback(async (cardId, toCol, toIndex, by) => {
+    if (blockGuestEdit()) return;
     const byId = by ?? (currentUser?.id ?? 'u_you');
     const s = stateRef.current;
     const prev = s.byId[cardId];
@@ -270,7 +291,7 @@ export function PlankProvider({ children, currentUser }) {
     const nextPos = neighbors[toIndex]?.position ?? (prevPos + 2000);
     await supabase.from('cards').update({ column_id: toCol, position: (prevPos + nextPos) / 2 }).eq('id', cardId);
     if (prev && prev.columnId !== toCol) logActivity(byId, 'moved', prev.key, `to ${colById[toCol]?.name}`);
-  }, [colById, logActivity]);
+  }, [blockGuestEdit, colById, logActivity]);
 
   const selectProject = useCallback(async (id) => {
     setProjects((prev) => {
@@ -291,6 +312,7 @@ export function PlankProvider({ children, currentUser }) {
   }, [loadProjectRoles]);
 
   const createProject = useCallback(async ({ name, description = '', key, color = 'var(--accent)' }) => {
+    if (blockGuestEdit()) return null;
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) return null;
     const memberId = `u_${authUser.id.replace(/-/g, '').slice(0, 12)}`;
@@ -302,9 +324,10 @@ export function PlankProvider({ children, currentUser }) {
       setProject(data);
     }
     return data ?? null;
-  }, []);
+  }, [blockGuestEdit]);
 
   const addCard = useCallback(async (toCol, title, by, atTop = true) => {
+    if (blockGuestEdit()) return null;
     by = by ?? (currentUser?.id ?? 'u_you');
     const s = stateRef.current;
     const projectKey = projectRef.current?.key || 'PLK';
@@ -320,9 +343,10 @@ export function PlankProvider({ children, currentUser }) {
     dispatch({ type: 'ADD_CARD', card, toCol, atTop });
     logActivity(by, 'created', key, `in ${colById[toCol]?.name}`);
     return card;
-  }, [colById, logActivity]);
+  }, [blockGuestEdit, colById, logActivity]);
 
   const updateCard = useCallback(async (cardId, patch) => {
+    if (blockGuestEdit()) return;
     dispatch({ type: 'UPDATE_CARD', cardId, patch });
     const dbPatch = {};
     if ('title'    in patch) dbPatch.title       = patch.title;
@@ -342,21 +366,24 @@ export function PlankProvider({ children, currentUser }) {
       if (patch.assignees.length > 0) await supabase.from('card_assignees').insert(patch.assignees.map((mid) => ({ card_id: cardId, member_id: mid })));
     }
     if (Object.keys(dbPatch).length > 0) await supabase.from('cards').update(dbPatch).eq('id', cardId);
-  }, []);
+  }, [blockGuestEdit]);
 
   const deleteCard = useCallback(async (cardId) => {
+    if (blockGuestEdit()) return;
     const c = stateRef.current.byId[cardId];
     dispatch({ type: 'DELETE_CARD', cardId });
     await supabase.from('cards').delete().eq('id', cardId);
     if (c) logActivity(currentUser?.id ?? 'u_you', 'deleted', c.key, '');
-  }, [logActivity]);
+  }, [blockGuestEdit, logActivity]);
 
   const deleteComment = useCallback(async (cardId, commentId) => {
+    if (blockGuestEdit()) return;
     dispatch({ type: 'DELETE_COMMENT', cardId, commentId });
     await supabase.from('comments').delete().eq('id', commentId);
-  }, []);
+  }, [blockGuestEdit]);
 
   const addComment = useCallback(async (cardId, text, by) => {
+    if (blockGuestEdit()) return null;
     by = by ?? (currentUser?.id ?? 'u_you');
     const { data: inserted } = await supabase.from('comments').insert({ card_id: cardId, author_id: by, text }).select().single();
     const comment = inserted ? { id: inserted.id, author: by, text, at: inserted.created_at } : { id: nextId('cm'), author: by, text, at: new Date().toISOString() };
@@ -364,24 +391,27 @@ export function PlankProvider({ children, currentUser }) {
     const c = stateRef.current.byId[cardId];
     if (c) logActivity(by, 'commented on', c.key, '');
     return comment;
-  }, [logActivity]);
+  }, [blockGuestEdit, logActivity]);
 
   const toggleSubtask = useCallback(async (cardId, subtaskId) => {
+    if (blockGuestEdit()) return;
     dispatch({ type: 'TOGGLE_SUBTASK', cardId, subtaskId });
     const sub = stateRef.current.byId[cardId]?.subtasks.find((s) => s.id === subtaskId);
     if (sub) await supabase.from('subtasks').update({ done: !sub.done }).eq('id', subtaskId);
-  }, []);
+  }, [blockGuestEdit]);
 
   const setSubtasks = useCallback(async (cardId, subtasks) => {
+    if (blockGuestEdit()) return;
     dispatch({ type: 'SET_SUBTASKS', cardId, subtasks });
     await supabase.from('subtasks').delete().eq('card_id', cardId);
     if (subtasks.length > 0) {
       const { data: inserted } = await supabase.from('subtasks').insert(subtasks.map((s, i) => ({ card_id: cardId, text: s.text, done: s.done, position: i }))).select();
       if (inserted) dispatch({ type: 'SET_SUBTASKS', cardId, subtasks: inserted.sort((a, b) => a.position - b.position).map((s) => ({ id: s.id, text: s.text, done: s.done })) });
     }
-  }, []);
+  }, [blockGuestEdit]);
 
   const updateMemberRole = useCallback(async (memberId, role) => {
+    if (blockGuestEdit()) return false;
     const projectId = projectRef.current?.id;
     if (!projectId) return false;
     const { error } = await supabase.from('project_members').upsert(
@@ -391,11 +421,12 @@ export function PlankProvider({ children, currentUser }) {
     if (error) { console.error('updateMemberRole:', error); return false; }
     setMemberRoles((prev) => ({ ...prev, [memberId]: role }));
     return true;
-  }, []);
+  }, [blockGuestEdit]);
 
   const clearActivity = useCallback(() => dispatch({ type: 'CLEAR_ACTIVITY' }), []);
 
   const reorderProjects = useCallback(async (orderedIds) => {
+    if (blockGuestEdit()) return;
     // Optimistic update
     setProjects((prev) => {
       const byId = Object.fromEntries(prev.map((p) => [p.id, p]));
@@ -407,15 +438,16 @@ export function PlankProvider({ children, currentUser }) {
         supabase.from('projects').update({ position: idx + 1 }).eq('id', id)
       )
     );
-  }, []);
+  }, [blockGuestEdit]);
   const deleteProject = useCallback(async (projectId) => {
+    if (blockGuestEdit()) return;
     await supabase.from('projects').delete().eq('id', projectId);
     setProjects((prev) => prev.filter((p) => p.id !== projectId));
     setProject((prev) => {
       if (prev?.id === projectId) return null;
       return prev;
     });
-  }, []);
+  }, [blockGuestEdit]);
 
   const setGhost = useCallback(() => {}, []);
   const reset    = useCallback(async () => {
@@ -434,7 +466,7 @@ export function PlankProvider({ children, currentUser }) {
       memberRoles[m.id] !== undefined || m.id === project?.owner_id
     ),
   [membersWithRoles, memberRoles, project?.owner_id]);
-  const value = { state, dispatch, loading, project, projects, projectLoading, createProject, selectProject, deleteProject, reorderProjects, currentUser, currentUserId, MEMBERS: membersWithRoles, projectMembers, LABELS, COLUMNS, memberById, labelById, colById, moveCard, addCard, updateCard, deleteCard, addComment, deleteComment, toggleSubtask, setSubtasks, setGhost, logActivity, reset, nextId, updateMemberRole, patchMember, clearActivity };
+  const value = { state, dispatch, loading, project, projects, projectLoading, createProject, selectProject, deleteProject, reorderProjects, currentUser, currentUserId, isGuest, MEMBERS: membersWithRoles, projectMembers, LABELS, COLUMNS, memberById, labelById, colById, moveCard, addCard, updateCard, deleteCard, addComment, deleteComment, toggleSubtask, setSubtasks, setGhost, logActivity, reset, nextId, updateMemberRole, patchMember, clearActivity };
   return <PlankCtx.Provider value={value}>{children}</PlankCtx.Provider>;
 }
 

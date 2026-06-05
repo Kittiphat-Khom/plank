@@ -29,7 +29,7 @@ function ColumnHeader({ column, count, wipOver }) {
 }
 
 // ── Column ────────────────────────────────────────────────────
-function Column({ column, cardIds, byId, drag, target, onCardPointerDown, onOpenCard, onAddCard, syncing, flash, typing }) {
+function Column({ column, cardIds, byId, drag, target, onCardPointerDown, onOpenCard, onAddCard, syncing, flash, typing, canCreate }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft]   = useState("");
   const inputRef = useRef();
@@ -97,7 +97,13 @@ function Column({ column, cardIds, byId, drag, target, onCardPointerDown, onOpen
             />
           </div>
         ) : (
-          <button onClick={() => setAdding(true)} className="col__add-btn">
+          <button
+            onClick={() => {
+              if (!canCreate) { showToast('Sign in to add cards', 'error'); return; }
+              setAdding(true);
+            }}
+            className="col__add-btn"
+          >
             <Icon name="plus" size={15} /> Add card
           </button>
         )}
@@ -252,6 +258,7 @@ export function Board({ onOpenCard, filterFn }) {
           syncing={state.syncing}
           flash={presence.flash}
           typing={presence.typing}
+          canCreate={perms.canCreate}
         />
       ))}
 

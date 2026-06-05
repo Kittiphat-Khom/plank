@@ -144,6 +144,26 @@
   color: var(--text);
 }
 
+.topbar__guest-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklch, var(--accent) 38%, var(--border));
+  background: color-mix(in oklch, var(--accent) 10%, var(--surface));
+  color: var(--accent-text);
+  font-size: 12.5px;
+  font-weight: 750;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+  transition: background 0.12s, border-color 0.12s;
+}
+.topbar__guest-btn:hover {
+  background: color-mix(in oklch, var(--accent) 16%, var(--surface));
+  border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
+}
+
 /* ── Filter ──────────────────────────────────────────────────── */
 .filter-btn {
   display: flex;
