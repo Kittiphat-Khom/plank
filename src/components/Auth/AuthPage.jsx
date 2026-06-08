@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './auth.css';
 import { supabase } from '../../lib/supabase';
 
-// ── Icons ─────────────────────────────────────────────────────
+
 const ICONS = {
   google: (
     <>
@@ -36,7 +36,7 @@ function Ico({ name, size = 18, stroke = 2, style }) {
   );
 }
 
-// ── Logo ──────────────────────────────────────────────────────
+
 function Logo({ size = 30, withText = true, light = false }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -61,7 +61,7 @@ function Logo({ size = 30, withText = true, light = false }) {
   );
 }
 
-// ── Password strength ─────────────────────────────────────────
+
 function strengthOf(pw) {
   let s = 0;
   if (pw.length >= 8) s++;
@@ -88,7 +88,7 @@ function PasswordStrength({ pw }) {
   );
 }
 
-// ── Field ─────────────────────────────────────────────────────
+
 function Field({ icon, type = 'text', label, value, onChange, placeholder, autoComplete, error, onBlur, children, rightSlot }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -116,7 +116,7 @@ function Field({ icon, type = 'text', label, value, onChange, placeholder, autoC
   );
 }
 
-// ── Checkbox ──────────────────────────────────────────────────
+
 function Checkbox({ checked, onChange, label, error }) {
   return (
     <button type="button" onClick={() => onChange(!checked)}
@@ -133,7 +133,7 @@ function Checkbox({ checked, onChange, label, error }) {
   );
 }
 
-// ── Spinner ───────────────────────────────────────────────────
+
 function Spinner({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ animation: 'spin 0.7s linear infinite' }}>
@@ -143,7 +143,7 @@ function Spinner({ size = 18 }) {
   );
 }
 
-// ── Brand Panel ───────────────────────────────────────────────
+
 const FEATURES = [
   { icon: 'bolt',  title: '60fps drag & drop',        desc: 'Move hundreds of cards without a hint of lag.' },
   { icon: 'users', title: 'Real-time presence',        desc: "See teammates' cursors and edits as they happen." },
@@ -202,7 +202,6 @@ function BrandPanel() {
   );
 }
 
-// ── Auth Form ─────────────────────────────────────────────────
 function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
 function AuthForm({ onContinueAsGuest }) {
@@ -217,7 +216,6 @@ function AuthForm({ onContinueAsGuest }) {
   const [touched, setTouched]   = useState({});
   const [loading, setLoading]   = useState(false);
   const [apiError, setApiError] = useState('');
-  // 'idle' | 'success' | 'confirm_email' | 'forgot' | 'forgot_sent'
   const [status, setStatus]     = useState('idle');
 
   const isReg = mode === 'register';
@@ -256,18 +254,16 @@ function AuthForm({ onContinueAsGuest }) {
       });
       setLoading(false);
       if (error) { setApiError(error.message); return; }
-      // If email confirmation required, show confirm screen
       if (data.user && !data.session) {
         setStatus('confirm_email');
       } else {
-        setStatus('success'); // auto-confirmed (Supabase disabled confirmation)
+        setStatus('success');
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password: pw });
       setLoading(false);
       if (error) { setApiError(error.message); return; }
       setStatus('success');
-      // onAuthStateChange in App will pick up the session automatically
     }
   }
 
@@ -278,14 +274,12 @@ function AuthForm({ onContinueAsGuest }) {
       options: { redirectTo: window.location.origin },
     });
     if (error) { setApiError(error.message); setLoading(false); }
-    // On success: browser redirects to Google → comes back → session set
   }
 
   function switchMode(m) {
     setMode(m); setErrors({}); setTouched({}); setPw(''); setApiError(''); setStatus('idle');
   }
 
-  // ── States ────────────────────────────────────────────────
   if (status === 'confirm_email') {
     return (
       <div style={{ textAlign: 'center', animation: 'pop-in .3s ease-out' }}>
@@ -334,7 +328,7 @@ function AuthForm({ onContinueAsGuest }) {
 
     return (
       <div style={{ animation: 'fade-in .3s' }}>
-        {/* Icon */}
+
         <div style={{ width: 52, height: 52, borderRadius: 14, background: 'var(--accent-soft)', border: '1.5px solid var(--accent-soft-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
           <Ico name="lock" size={24} stroke={1.8} style={{ color: 'var(--accent-text)' }} />
         </div>
@@ -402,7 +396,7 @@ function AuthForm({ onContinueAsGuest }) {
     );
   }
 
-  // ── Form ──────────────────────────────────────────────────
+
   return (
     <form onSubmit={submit} noValidate style={{ animation: 'fade-in .3s' }}>
       <div style={{ display: 'flex', gap: 3, background: 'var(--bg-sunken)', borderRadius: 11, padding: 4, marginBottom: 26, border: '1px solid var(--border)' }}>
@@ -533,7 +527,7 @@ function AuthForm({ onContinueAsGuest }) {
   );
 }
 
-// ── Theme Toggle ──────────────────────────────────────────────
+
 function ThemeToggle() {
   const [dark, setDark] = useState(false);
   useEffect(() => { document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light'); }, [dark]);
@@ -547,7 +541,7 @@ function ThemeToggle() {
   );
 }
 
-// ── AuthPage ──────────────────────────────────────────────────
+
 export function AuthPage({ onContinueAsGuest }) {
   return (
     <div className="auth-root">

@@ -1,4 +1,4 @@
-// Transform Supabase card row → component-friendly shape
+
 export function transformCard(raw) {
   return {
     id: raw.id,

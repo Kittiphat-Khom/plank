@@ -26,7 +26,7 @@ const DUE_OPTS = [
   ["week",    "Next 7 days"],
 ];
 
-// ── View Switcher ─────────────────────────────────────────────
+
 function ViewSwitcher({ view, setView }) {
   return (
     <div className="view-switcher">
@@ -46,7 +46,7 @@ function ViewSwitcher({ view, setView }) {
   );
 }
 
-// ── Filter Popover ────────────────────────────────────────────
+
 function FilterPopover({ filters, setFilters }) {
   const { projectMembers, LABELS } = usePlank();
   const ref   = useRef();
@@ -136,7 +136,7 @@ function FilterPopover({ filters, setFilters }) {
   );
 }
 
-// ── Topbar ────────────────────────────────────────────────────
+
 export function Topbar({ view, setView, filters, setFilters, groupBy, setGroupBy, onOpenCmd, onToggleActivity, activityOpen, onToggleMenu, onNewCard, onShare, isGuest, onSignIn }) {
   const presence = usePresence();
   const { project } = usePlank();

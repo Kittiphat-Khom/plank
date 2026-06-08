@@ -63,7 +63,7 @@ export function MembersView({ onEditProject }) {
   const { MEMBERS, project, updateMemberRole, currentUserId } = usePlank();
   const perms = usePermissions();
 
-  // Exclude hardcoded bot/seed members — show only real auth users
+
   const realMembers = MEMBERS.filter((m) => !BOT_IDS.has(m.id) || m.you || m.id === currentUserId);
   const me     = realMembers.find((m) => m.you || m.id === currentUserId);
   const others = realMembers.filter((m) => !m.you && m.id !== currentUserId);
@@ -73,7 +73,7 @@ export function MembersView({ onEditProject }) {
       maxWidth: 640, margin: '0 auto', padding: '40px 24px',
       height: '100%', overflowY: 'auto',
     }}>
-      {/* Project header */}
+
       {project && (
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -111,7 +111,7 @@ export function MembersView({ onEditProject }) {
         </div>
       )}
 
-      {/* Members */}
+
       <div style={{ marginBottom: 8, fontSize: 12, fontWeight: 700, color: 'var(--text-faint)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
         Members · {realMembers.length}
       </div>
@@ -121,7 +121,7 @@ export function MembersView({ onEditProject }) {
         <MemberRow key={m.id} member={m} perms={perms} onRoleChange={updateMemberRole} />
       ))}
 
-      {/* Role legend */}
+
       <div style={{ display: 'flex', gap: 16, marginTop: 20, flexWrap: 'wrap' }}>
         {ALL_ROLES.map((r) => (
           <div key={r} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, color: 'var(--text-faint)' }}>

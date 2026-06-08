@@ -22,7 +22,7 @@ export function PresenceProvider({ children, currentUser }) {
     setTimeout(() => setFlash((f) => { const n = { ...f }; delete n[cardId]; return n; }), 1200);
   }, []);
 
-  // presence channel
+
   useEffect(() => {
     if (!currentUser || !plank.project?.id) return;
 
@@ -73,7 +73,7 @@ export function PresenceProvider({ children, currentUser }) {
     };
   }, [currentUser?.id, plank.project?.id]);
 
-  // separate broadcast channel for cursors
+
   useEffect(() => {
     if (!currentUser || !plank.project?.id) return;
 
@@ -103,7 +103,7 @@ export function PresenceProvider({ children, currentUser }) {
     };
   }, [currentUser?.id, plank.project?.id]);
 
-  // broadcast own cursor position (throttled to ~30fps)
+
   useEffect(() => {
     if (!currentUser) return;
     const resolveColor = (c) => {

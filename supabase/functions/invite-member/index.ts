@@ -44,12 +44,12 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Check if user already exists
+
     const { data: { users }, error: listError } = await adminClient.auth.admin.listUsers();
     const existingUser = !listError ? users.find((u) => u.email === email) : null;
 
     if (existingUser) {
-      // User exists — derive member_id and add directly to project_members
+
       const memberId = `u_${existingUser.id.replace(/-/g, "").slice(0, 12)}`;
       const { error: insertError } = await adminClient
         .from("project_members")
@@ -67,7 +67,7 @@ serve(async (req) => {
       });
     }
 
-    // New user — send invite email
+
     const { error } = await adminClient.auth.admin.inviteUserByEmail(email, {
       data: { project_id, role: role ?? "member" },
       redirectTo: `${Deno.env.get("SITE_URL") ?? "http://localhost:5173"}/`,

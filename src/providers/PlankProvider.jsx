@@ -6,7 +6,7 @@ import { showToast } from '../lib/toast';
 
 const PlankCtx = createContext(null);
 
-// ── Supabase query helpers ────────────────────────────────────
+
 const CARD_SELECT = `
   *,
   card_labels(label_id),
@@ -44,7 +44,7 @@ function buildState(cards, activity) {
   return { byId, cardsByCol, activity, syncing: {}, ghosted: {} };
 }
 
-// ── Reducer ───────────────────────────────────────────────────
+
 function reducer(state, action) {
   switch (action.type) {
     case 'HYDRATE': return action.state;
@@ -144,7 +144,7 @@ function reducer(state, action) {
 let _seq = Date.now();
 export const nextId = (p) => `${p}_${(++_seq).toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
-// ── Provider ──────────────────────────────────────────────────
+
 export function PlankProvider({ children, currentUser }) {
   const isGuest = !!currentUser?.isGuest;
   const emptyState = { byId: {}, cardsByCol: Object.fromEntries(COLUMNS.map((c) => [c.id, []])), activity: [], syncing: {}, ghosted: {} };
@@ -158,7 +158,7 @@ export function PlankProvider({ children, currentUser }) {
   useEffect(() => { stateRef.current = state; }, [state]);
   useEffect(() => { projectRef.current = project; }, [project]);
 
-  // ── DB members (real auth users) ────────────────────────────
+
   const [dbMembers, setDbMembers] = useState([]);
   useEffect(() => {
     supabase.from('members').select('*').then(({ data }) => {
@@ -166,7 +166,7 @@ export function PlankProvider({ children, currentUser }) {
     });
   }, []);
 
-  // ── Role state — per project ─────────────────────────────────
+
   const [memberRoles, setMemberRoles] = useState(
     () => Object.fromEntries(MEMBERS.map((m) => [m.id, m.role || 'member']))
   );
@@ -177,7 +177,7 @@ export function PlankProvider({ children, currentUser }) {
       .from('project_members')
       .select('member_id, role')
       .eq('project_id', projectId);
-    // Reset to only this project's roles (don't merge with previous project)
+
     setMemberRoles(Object.fromEntries((data ?? []).map((r) => [r.member_id, r.role])));
   }, []);
 
@@ -194,8 +194,8 @@ export function PlankProvider({ children, currentUser }) {
   const colById    = useMemo(() => Object.fromEntries(COLUMNS.map((c) => [c.id, c])), []);
 
   useEffect(() => {
-    if (!currentUser?.id) return; // wait until auth ready
-    // Load projects and member roles first, then fetch cards for active project
+    if (!currentUser?.id) return;
+
     Promise.all([
       fetchActivity(),
       (async () => {
@@ -427,12 +427,12 @@ export function PlankProvider({ children, currentUser }) {
 
   const reorderProjects = useCallback(async (orderedIds) => {
     if (blockGuestEdit()) return;
-    // Optimistic update
+
     setProjects((prev) => {
       const byId = Object.fromEntries(prev.map((p) => [p.id, p]));
       return orderedIds.map((id) => byId[id]).filter(Boolean);
     });
-    // Persist each position to DB
+
     await Promise.all(
       orderedIds.map((id, idx) =>
         supabase.from('projects').update({ position: idx + 1 }).eq('id', id)
@@ -460,7 +460,7 @@ export function PlankProvider({ children, currentUser }) {
   }, []);
 
   const currentUserId = currentUser?.id ?? 'u_you';
-  // Members who are explicitly in the current project (have a role entry)
+
   const projectMembers = useMemo(() =>
     membersWithRoles.filter((m) =>
       memberRoles[m.id] !== undefined || m.id === project?.owner_id

@@ -28,7 +28,7 @@ export function TimelineView({ filterFn, onOpen }) {
     <div style={{ flex: 1, overflow: "auto", padding: "16px 0 24px" }}>
       <div style={{ minWidth: TOTAL_DAYS * DAY_W + 240, padding: "0 24px" }}>
 
-        {/* Week header */}
+
         <div style={{ display: "flex", marginLeft: 200, position: "sticky", top: 0, zIndex: 2, background: "var(--bg)" }}>
           {Array.from({ length: WEEKS }).map((_, w) => {
             const d = new Date(start.getTime() + w * 7 * DAY_MS);
@@ -51,17 +51,17 @@ export function TimelineView({ filterFn, onOpen }) {
         </div>
 
         <div style={{ position: "relative" }}>
-          {/* Today line */}
+
           <div style={{ position: "absolute", left: todayX, top: 0, bottom: 0, width: 2, background: "var(--accent)", zIndex: 1, opacity: 0.7 }}>
             <span style={{ position: "absolute", top: -2, left: -18, fontSize: 9.5, fontWeight: 700, color: "var(--accent)", background: "var(--bg)", padding: "0 3px" }}>
               today
             </span>
           </div>
 
-          {/* Lanes */}
+
           {lanes.map((lane) => (
             <div key={lane.col.id} style={{ display: "flex", alignItems: "stretch", borderTop: "1px solid var(--border)", minHeight: 44 }}>
-              {/* Lane label */}
+
               <div style={{
                 width: 200,
                 flexShrink: 0,
@@ -79,7 +79,7 @@ export function TimelineView({ filterFn, onOpen }) {
                 <span style={{ fontSize: 11, color: "var(--text-faint)" }}>{lane.cards.length}</span>
               </div>
 
-              {/* Cards */}
+
               <div style={{ flex: 1, position: "relative", padding: "6px 0" }}>
                 {lane.cards.map((c) => {
                   const end  = xFor(c.due);

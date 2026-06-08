@@ -1,4 +1,4 @@
-// ── Time helpers ──────────────────────────────────────────────
+
 export function relTime(iso) {
   if (!iso) return "";
   const d = new Date(iso), now = new Date();
@@ -26,7 +26,7 @@ export function dueInfo(iso) {
   return { tone, text, days };
 }
 
-// ── Search helpers ────────────────────────────────────────────
+
 export function fuzzy(needle, hay) {
   needle = needle.toLowerCase(); hay = hay.toLowerCase();
   if (!needle) return 0;

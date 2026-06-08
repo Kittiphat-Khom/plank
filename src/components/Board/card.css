@@ -1,4 +1,4 @@
-/* ── Card ────────────────────────────────────────────────────── */
+
 .card {
   position: relative;
   background: var(--surface);
@@ -34,7 +34,7 @@
   animation: flash-bg 1.2s ease-out;
 }
 
-/* ── Cover ───────────────────────────────────────────────────── */
+
 .card__cover {
   margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 10px;
   height: 110px;
@@ -47,7 +47,7 @@
   display: block;
 }
 
-/* ── Labels ──────────────────────────────────────────────────── */
+
 .card__labels {
   display: flex;
   flex-wrap: wrap;
@@ -55,7 +55,7 @@
   margin-bottom: 7px;
 }
 
-/* ── Title ───────────────────────────────────────────────────── */
+
 .card__title-row {
   display: flex;
   gap: 6px;
@@ -76,7 +76,7 @@
   font-size: 13px;
 }
 
-/* ── Typing ──────────────────────────────────────────────────── */
+
 .card__typing {
   margin-top: 6px;
   display: flex;
@@ -102,7 +102,7 @@
 .typing-dot:nth-child(2) { animation-delay: 0.15s; }
 .typing-dot:nth-child(3) { animation-delay: 0.3s; }
 
-/* ── Meta ────────────────────────────────────────────────────── */
+
 .card__meta {
   display: flex;
   align-items: center;
@@ -133,7 +133,7 @@
   justify-content: center;
 }
 
-/* ── Subtask Progress ────────────────────────────────────────── */
+
 .subtask-progress {
   display: inline-flex;
   align-items: center;
@@ -164,7 +164,7 @@
   background: var(--c-green);
 }
 
-/* ── Footer ──────────────────────────────────────────────────── */
+
 .card__footer {
   display: flex;
   align-items: center;
@@ -184,7 +184,7 @@
   margin-left: auto;
 }
 
-/* ── Sync Indicator ──────────────────────────────────────────── */
+
 .card__sync {
   position: absolute;
   top: 8px;

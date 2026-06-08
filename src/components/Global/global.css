@@ -1,4 +1,4 @@
-/* ── Icon Button ─────────────────────────────────────────────── */
+
 .icon-btn {
   width: 32px;
   height: 32px;
@@ -33,7 +33,7 @@
   pointer-events: none;
 }
 
-/* ── Picker Item ─────────────────────────────────────────────── */
+
 .picker-item {
   display: flex;
   align-items: center;
@@ -58,7 +58,7 @@
   align-items: center;
 }
 
-/* ── Avatar ──────────────────────────────────────────────────── */
+
 .avatar {
   width: var(--sz, 26px);
   height: var(--sz, 26px);
@@ -112,7 +112,7 @@
   z-index: 0;
 }
 
-/* ── Label ───────────────────────────────────────────────────── */
+
 .label-chip {
   display: inline-flex;
   align-items: center;
@@ -142,7 +142,7 @@
   display: inline-block;
 }
 
-/* ── Due Badge ───────────────────────────────────────────────── */
+
 .due-badge {
   display: inline-flex;
   align-items: center;
@@ -170,7 +170,7 @@
   background: color-mix(in oklch, var(--c-amber) 16%, var(--surface));
 }
 
-/* ── Priority Flag ───────────────────────────────────────────── */
+
 .priority-flag {
   display: inline-flex;
   align-items: center;
@@ -192,7 +192,7 @@
 .priority-bar:nth-child(2) { height: 8px; }
 .priority-bar:nth-child(3) { height: 11px; }
 
-/* Fill bars per priority level */
+
 .priority-bars[data-level="urgent"] .priority-bar,
 .priority-bars[data-level="high"]   .priority-bar {
   background: var(--color-priority);

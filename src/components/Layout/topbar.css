@@ -1,4 +1,4 @@
-/* ── Topbar ──────────────────────────────────────────────────── */
+
 .topbar {
   height: var(--topbar-h);
   flex-shrink: 0;
@@ -38,7 +38,7 @@
   margin-left: 6px;
 }
 
-/* ── Menu button (mobile) ────────────────────────────────────── */
+
 .menu-btn {
   width: 32px;
   height: 32px;
@@ -52,7 +52,7 @@
   background: var(--surface-hover);
 }
 
-/* ── View Switcher ───────────────────────────────────────────── */
+
 .view-switcher {
   display: flex;
   gap: 2px;
@@ -86,7 +86,7 @@
   background: var(--surface);
 }
 
-/* ── Search ──────────────────────────────────────────────────── */
+
 .topbar__search {
   display: flex;
   align-items: center;
@@ -108,7 +108,7 @@
   text-align: left;
 }
 
-/* ── New Card Button ─────────────────────────────────────────── */
+
 .topbar__new-btn {
   display: flex;
   align-items: center;
@@ -164,7 +164,7 @@
   border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
 }
 
-/* ── Filter ──────────────────────────────────────────────────── */
+
 .filter-btn {
   display: flex;
   align-items: center;
@@ -196,7 +196,7 @@
   text-align: center;
 }
 
-/* ── Group ───────────────────────────────────────────────────── */
+
 .group-btn {
   display: flex;
   align-items: center;
@@ -214,7 +214,7 @@
   background: var(--surface-hover);
 }
 
-/* ── Filter Popover ──────────────────────────────────────────── */
+
 .filter-popover {
   padding: 4px 6px;
 }

@@ -16,7 +16,7 @@ export function ProjectSettingsModal({ project, onClose }) {
   const [showAdd, setShowAdd] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('member');
-  const [inviteStatus, setInviteStatus] = useState(null); // 'sent' | 'error' | null
+  const [inviteStatus, setInviteStatus] = useState(null);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [linkCopied, setLinkCopied] = useState(false);
 
@@ -71,7 +71,7 @@ export function ProjectSettingsModal({ project, onClose }) {
       try {
         await navigator.clipboard.writeText(url);
       } catch {
-        // fallback for non-secure context
+
         const el = document.createElement('textarea');
         el.value = url;
         el.style.position = 'fixed';
@@ -94,14 +94,14 @@ export function ProjectSettingsModal({ project, onClose }) {
     if (!email) return;
     const { supabase: sb } = await import('../../lib/supabase');
 
-    // Save invite to DB
+
     const { error: dbError } = await sb.from('project_invites').upsert(
       { project_id: project.id, email, role: inviteRole, invited_by: currentUser?.id ?? null },
       { onConflict: 'project_id,email' }
     );
     if (dbError) { console.error('invite error:', dbError); setInviteStatus('error'); return; }
 
-    // Send invite email via Edge Function
+
     const { error: fnError } = await sb.functions.invoke('invite-member', {
       body: { email, project_id: project.id, role: inviteRole },
     });
@@ -122,13 +122,13 @@ export function ProjectSettingsModal({ project, onClose }) {
   return createPortal(
     <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 8000, background: 'oklch(0.2 0.02 264 / 0.42)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
       <div onClick={(e) => e.stopPropagation()} style={{ width: 480, background: 'var(--bg)', borderRadius: 'var(--r-xl)', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden', maxHeight: '85vh' }}>
-        {/* Header */}
+
         <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           <span style={{ fontWeight: 700, fontSize: 15 }}>Project settings</span>
           <button onClick={onClose} style={{ marginLeft: 'auto', color: 'var(--text-faint)' }}><Icon name="close" size={16} /></button>
         </div>
 
-        {/* Name */}
+
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
           <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '.07em', display: 'block', marginBottom: 6 }}>Project name</label>
           <div style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-sunken)', fontSize: 14, color: 'var(--text-muted)', boxSizing: 'border-box', userSelect: 'none' }}>
@@ -136,10 +136,10 @@ export function ProjectSettingsModal({ project, onClose }) {
           </div>
         </div>
 
-        {/* Members */}
+
         <div style={{ padding: '16px 20px', flex: 1, overflowY: 'auto' }}>
 
-          {/* Invite link */}
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderRadius: 10, background: 'var(--surface)', border: '1px solid var(--border)', marginBottom: 16 }}>
             <div>
               <div style={{ fontSize: 13, fontWeight: 600 }}>Invite link</div>
@@ -156,7 +156,7 @@ export function ProjectSettingsModal({ project, onClose }) {
 
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>Invite by email</div>
 
-          {/* Invite input */}
+
           <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
             <input
               type="email"
@@ -180,7 +180,7 @@ export function ProjectSettingsModal({ project, onClose }) {
           {inviteStatus === 'sent' && <p style={{ fontSize: 12, color: 'var(--c-green)', marginBottom: 8 }}>✓ Invite saved — they'll join when they sign up</p>}
           {inviteStatus === 'error' && <p style={{ fontSize: 12, color: 'var(--c-red)', marginBottom: 8 }}>Error sending invite</p>}
 
-          {/* Pending invites */}
+
           {pendingInvites.length > 0 && (
             <div style={{ marginBottom: 16 }}>
               <div style={{ fontSize: 11, color: 'var(--text-faint)', fontWeight: 600, marginBottom: 6 }}>PENDING</div>
@@ -206,9 +206,9 @@ export function ProjectSettingsModal({ project, onClose }) {
 
           <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10, marginTop: 4 }}>Members & permissions</div>
 
-          {/* Current members */}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Owner — identified by project.owner_id, not current user */}
+
             {MEMBERS.filter((m) => m.id === project.owner_id).map((m) => (
               <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
                 <Avatar member={m} size={30} />
@@ -220,7 +220,7 @@ export function ProjectSettingsModal({ project, onClose }) {
               </div>
             ))}
 
-            {/* Project members — exclude owner to avoid duplication */}
+
             {rows.filter((row) => row.member_id !== project.owner_id).map((row) => {
               const m = memberById[row.member_id];
               if (!m) return null;
@@ -252,7 +252,7 @@ export function ProjectSettingsModal({ project, onClose }) {
           </div>
         </div>
 
-        {/* Footer */}
+
         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 20px', borderTop: '1px solid var(--border)', gap: 8, flexShrink: 0 }}>
           <button onClick={onClose} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 600, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-muted)' }}>Cancel</button>
           <button onClick={onClose} style={{ padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 700, background: 'var(--accent)', color: '#fff' }}>Save</button>
@@ -368,7 +368,7 @@ function ProfilePopover({ member, anchorRef, open, onClose, onUpdated, onSignOut
   const ref = useRef();
   const fileRef = useRef();
   const [pos, setPos] = useState(null);
-  const [tab, setTab] = useState('main'); // 'main' | 'edit'
+  const [tab, setTab] = useState('main');
   const [editName, setEditName] = useState('');
   const [editHandle, setEditHandle] = useState('');
   const [saving, setSaving] = useState(false);
@@ -510,12 +510,12 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
   const isGuest = !!plank.isGuest;
   const [settingsProjectId, setSettingsProjectId] = useState(null);
 
-  // --- project drag-to-reorder (order from DB via projects prop) ---
+
   const [projectOrder, setProjectOrder] = useState(() => projects.map((p) => p.id));
   const dragIdx = useRef(null);
   const [dropIdx, setDropIdx] = useState(null);
 
-  // Sync when projects list changes (add/remove/reload)
+
   useEffect(() => {
     setProjectOrder((prev) => {
       const incoming = projects.map((p) => p.id);
@@ -692,7 +692,7 @@ export function Sidebar({ onOpenCmd, onClose, onNewProject, view, onSetView, inb
           })}
         </div>
 
-        {/* Current user */}
+
         {plank.currentUser && (() => {
           const me = localUser ?? plank.currentUser;
           return (

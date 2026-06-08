@@ -1,4 +1,4 @@
-/* ── Setup Screen ────────────────────────────────────────────── */
+
 .setup-screen {
   position: fixed;
   inset: 0;
@@ -10,7 +10,7 @@
   overflow-y: auto;
 }
 
-/* Subtle grid pattern background */
+
 .setup-screen::before {
   content: '';
   position: fixed;
@@ -35,7 +35,7 @@
   z-index: 1;
 }
 
-/* ── Header ──────────────────────────────────────────────────── */
+
 .setup-logo {
   width: 48px;
   height: 48px;
@@ -74,7 +74,7 @@
   line-height: 1.5;
 }
 
-/* ── Fields ──────────────────────────────────────────────────── */
+
 .setup-fields {
   display: flex;
   flex-direction: column;
@@ -152,7 +152,7 @@
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* ── Color Picker ────────────────────────────────────────────── */
+
 .setup-colors {
   display: flex;
   gap: 8px;
@@ -175,7 +175,7 @@
   transform: scale(1.08);
 }
 
-/* ── CTA ─────────────────────────────────────────────────────── */
+
 .setup-submit {
   width: 100%;
   height: 48px;
@@ -204,7 +204,7 @@
   cursor: not-allowed;
 }
 
-/* ── Error ───────────────────────────────────────────────────── */
+
 .setup-error {
   font-size: 12.5px;
   color: var(--c-red);

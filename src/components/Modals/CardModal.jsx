@@ -6,7 +6,7 @@ import { showToast } from '../../lib/toast';
 import { relTime } from '../../helpers';
 import { Icon, Avatar, AvatarStack, LabelChip, PriorityFlag, PRIORITY, Popover, PickerItem } from '../Global';
 
-// ── Style constants ───────────────────────────────────────────
+
 const S = {
   backdrop: {
     position: "fixed",
@@ -141,7 +141,7 @@ const S = {
   },
 };
 
-// ── Field Row ─────────────────────────────────────────────────
+
 function FieldRow({ label, children }) {
   return (
     <div style={{ paddingBottom: 10 }}>
@@ -151,7 +151,7 @@ function FieldRow({ label, children }) {
   );
 }
 
-// ── Section Label ─────────────────────────────────────────────
+
 function SectionLabel({ icon, text, inline }) {
   return (
     <div style={{
@@ -168,7 +168,7 @@ function SectionLabel({ icon, text, inline }) {
   );
 }
 
-// ── Comment Composer ──────────────────────────────────────────
+
 function CommentComposer({ onSubmit, projectMembers, disabled }) {
   const { MEMBERS } = usePlank();
   const mentionPool = projectMembers?.length ? projectMembers : [];
@@ -271,7 +271,7 @@ function CommentComposer({ onSubmit, projectMembers, disabled }) {
   );
 }
 
-// ── Comment Row ───────────────────────────────────────────────
+
 function CommentRow({ comment, cardId }) {
   const { memberById, MEMBERS, deleteComment, currentUserId } = usePlank();
   const [hovered, setHovered] = useState(false);
@@ -314,7 +314,7 @@ function CommentRow({ comment, cardId }) {
   );
 }
 
-// ── AI Panel ──────────────────────────────────────────────────
+
 function AiPanel({ card, disabled }) {
   const { setSubtasks, nextId } = usePlank();
   const [busy, setBusy]     = useState(false);
@@ -391,7 +391,7 @@ function AiPanel({ card, disabled }) {
   );
 }
 
-// ── Subtask Progress Bar ──────────────────────────────────────
+
 function SubtaskProgressBar({ done, total }) {
   return (
     <div style={{ flex: 1, height: 5, borderRadius: 99, background: "var(--border-strong)", overflow: "hidden", maxWidth: 160 }}>
@@ -406,7 +406,7 @@ function SubtaskProgressBar({ done, total }) {
   );
 }
 
-// ── Card Modal ────────────────────────────────────────────────
+
 export function CardModal({ cardId, onClose, draft = false, onCreated }) {
   const perms = usePermissions();
   const plank = usePlank();
@@ -433,7 +433,7 @@ export function CardModal({ cardId, onClose, draft = false, onCreated }) {
     projectMemberIds === null || projectMemberIds.has(m.id)
   );
 
-  // ── Draft state (create mode) ──────────────────────────────
+
   const [draftTitle,     setDraftTitle]     = useState('');
   const [draftDesc,      setDraftDesc]      = useState('');
   const [draftColId,     setDraftColId]     = useState('c_backlog');
@@ -468,7 +468,7 @@ export function CardModal({ cardId, onClose, draft = false, onCreated }) {
     }
   }
 
-  // ── Edit state ─────────────────────────────────────────────
+
   const card = draft ? null : state.byId[cardId];
   const [newSub, setNewSub]     = useState("");
   const [pop, setPop]           = useState(null);
@@ -492,7 +492,7 @@ export function CardModal({ cardId, onClose, draft = false, onCreated }) {
 
 if (!draft && !card) return null;
 
-  // ── Derived (edit mode only) ───────────────────────────────
+
   const labels    = draft ? (LABELS || []).filter(l => draftLabelIds.includes(l.id))
                           : card.labels.map((id) => labelById[id]).filter(Boolean);
   const assignees = draft ? draftAssignIds.map(id => memberById[id]).filter(Boolean)
@@ -520,7 +520,7 @@ if (!draft && !card) return null;
     <div onClick={onClose} style={S.backdrop}>
       <div onClick={(e) => e.stopPropagation()} style={S.modal}>
 
-{/* Header */}
+
         <div style={S.modalHeader}>
           <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--text-faint)" }}>{draft ? "New task" : card.key}</span>
           <div style={{ display: "flex", gap: 5 }}>{labels.map((l) => <LabelChip key={l.id} label={l} />)}</div>
@@ -534,17 +534,17 @@ if (!draft && !card) return null;
           </button>
         </div>
 
-        {/* Viewer banner */}
+
         {!perms.canEdit && !draft && (
           <div style={{ margin: '0 0 8px', padding: '8px 14px', background: 'color-mix(in oklch, var(--c-amber) 12%, transparent)', border: '1px solid color-mix(in oklch, var(--c-amber) 25%, transparent)', borderRadius: 8, fontSize: 12.5, color: 'var(--c-amber)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
             <Icon name="eye" size={13} /> View only — you need member access to edit
           </div>
         )}
 
-        {/* Body */}
+
         <div style={S.body} className="modal-grid">
 
-          {/* Main column */}
+
           <div style={S.main}>
             {draft && <><div style={{ fontSize: 11, fontWeight: 600, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 5 }}>Title</div></>}
             <textarea
@@ -575,7 +575,7 @@ if (!draft && !card) return null;
 
             <AiPanel card={card} disabled={draft || !perms.canEdit} />
 
-            {/* Subtasks */}
+
             <div style={{ marginTop: 18 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
                 <SectionLabel icon="check" text="Subtasks" inline />
@@ -644,10 +644,10 @@ if (!draft && !card) return null;
 
           </div>
 
-          {/* Sidebar column */}
+
           <div style={S.sidebar} className="modal-sidebar">
 
-            {/* Images */}
+
             <FieldRow label="Images">
               <input ref={imageInputRef} type="file" accept="image/*" multiple style={{ display: "none" }}
                 onChange={(e) => {
@@ -691,7 +691,7 @@ if (!draft && !card) return null;
               )}
             </FieldRow>
 
-            {/* Status */}
+
             <FieldRow label="Status">
               <button
                 ref={statusRef}
@@ -710,7 +710,7 @@ if (!draft && !card) return null;
               </Popover>
             </FieldRow>
 
-            {/* Assignees */}
+
             <FieldRow label="Assignees">
               <button
                 ref={assignRef}
@@ -732,7 +732,7 @@ if (!draft && !card) return null;
               </Popover>
             </FieldRow>
 
-            {/* Labels */}
+
             <FieldRow label="Labels">
               <button
                 ref={labelRef}
@@ -754,7 +754,7 @@ if (!draft && !card) return null;
               </Popover>
             </FieldRow>
 
-            {/* Priority */}
+
             <FieldRow label="Priority">
               <div style={{ display: "flex", gap: 4 }}>
                 {["low", "med", "high", "urgent"].map((p) => (
@@ -778,7 +778,7 @@ if (!draft && !card) return null;
               </div>
             </FieldRow>
 
-            {/* Due date */}
+
             <FieldRow label="Due date">
               <input type="date"
                 value={draft ? draftDue : undefined}
@@ -792,7 +792,7 @@ if (!draft && !card) return null;
 
           </div>
 
-          {/* Comments column */}
+
           <div style={{ borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--bg)" }}>
             <div style={{ padding: "14px 16px 12px", borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: ".07em" }}>Activity & comments</div>
@@ -809,7 +809,7 @@ if (!draft && !card) return null;
           </div>
 
         </div>
-        {/* Footer */}
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '10px 18px', borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
           <div>
             {!draft && perms.canEdit && (

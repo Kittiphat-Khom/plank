@@ -1,4 +1,4 @@
-/* ── Board ───────────────────────────────────────────────────── */
+
 .board {
   flex: 1;
   overflow-x: auto;
@@ -17,7 +17,7 @@
   will-change: transform;
 }
 
-/* ── Column ──────────────────────────────────────────────────── */
+
 .col {
   width: var(--col-w);
   flex-shrink: 0;
@@ -30,7 +30,7 @@
   padding: 10px 10px 6px;
 }
 
-/* ── Column Header ───────────────────────────────────────────── */
+
 .col__header {
   display: flex;
   align-items: center;
@@ -73,7 +73,7 @@
   background: color-mix(in oklch, var(--c-red) 14%, transparent);
 }
 
-/* ── Column List ─────────────────────────────────────────────── */
+
 .col__list {
   flex: 1;
   overflow-y: auto;
@@ -95,7 +95,7 @@
   outline-color: var(--accent-soft-border);
 }
 
-/* ── Placeholder ─────────────────────────────────────────────── */
+
 .col__placeholder {
   border-radius: var(--r-md);
   background: color-mix(in oklch, var(--accent) 11%, transparent);
@@ -104,7 +104,7 @@
   animation: pop-in 0.12s ease-out;
 }
 
-/* ── Add Card ────────────────────────────────────────────────── */
+
 .col__add-wrap {
   background: var(--surface);
   border-radius: var(--r-md);

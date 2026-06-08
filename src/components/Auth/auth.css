@@ -1,4 +1,4 @@
-/* ── Auth Layout ─────────────────────────────────────────────── */
+
 .auth-root {
   min-height: 100%;
   display: flex;
@@ -18,7 +18,7 @@
   .auth-mobile-logo { display: flex !important; }
 }
 
-/* ── Theme Toggle ────────────────────────────────────────────── */
+
 .auth-theme-btn {
   position: fixed;
   top: 18px;
@@ -38,7 +38,7 @@
 }
 .auth-theme-btn:hover { background: var(--surface-hover); }
 
-/* ── Form Side ───────────────────────────────────────────────── */
+
 .auth-form-side {
   display: flex;
   align-items: center;
@@ -51,7 +51,7 @@
   max-width: 380px;
 }
 
-/* ── Social Buttons hover ────────────────────────────────────── */
+
 .auth-social-btn {
   flex: 1;
   display: flex;

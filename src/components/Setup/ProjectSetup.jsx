@@ -17,7 +17,7 @@ function accentColor(hue) {
   return `oklch(0.55 0.18 ${hue})`;
 }
 
-// Auto-generate a 2-5 char key from project name
+
 function generateKey(name) {
   const words = name.trim().toUpperCase().split(/[\s\-_]+/).filter(Boolean);
   if (!words.length) return '';
@@ -26,7 +26,7 @@ function generateKey(name) {
   return words.slice(0, 4).map((w) => w[0]).join('').slice(0, 5);
 }
 
-// ── Logo ──────────────────────────────────────────────────────
+
 function Logo() {
   return (
     <div className="setup-logo">
@@ -39,7 +39,7 @@ function Logo() {
   );
 }
 
-// ── Main Component ────────────────────────────────────────────
+
 export function ProjectSetup({ onDone, modal = false }) {
   const { createProject } = usePlank();
 
@@ -106,7 +106,7 @@ export function ProjectSetup({ onDone, modal = false }) {
 
         <form onSubmit={handleSubmit}>
           <div className="setup-fields">
-            {/* Name + Key */}
+
             <div className="setup-field-row">
               <div className="setup-field">
                 <label className="setup-label">
@@ -137,7 +137,7 @@ export function ProjectSetup({ onDone, modal = false }) {
               </div>
             </div>
 
-            {/* Description */}
+
             <div className="setup-field">
               <label className="setup-label">Description</label>
               <textarea
@@ -149,7 +149,7 @@ export function ProjectSetup({ onDone, modal = false }) {
               />
             </div>
 
-            {/* Color */}
+
             <div className="setup-field">
               <label className="setup-label">Accent color</label>
               <div className="setup-colors">

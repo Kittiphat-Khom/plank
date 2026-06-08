@@ -5,7 +5,7 @@ import { useFilteredCards } from '../../hooks/useFilteredCards';
 import { dueInfo } from '../../helpers';
 import { LabelChip, DueBadge, AvatarStack, PriorityFlag, PRIORITY } from '../Global';
 
-// ── List Row ──────────────────────────────────────────────────
+
 function ListRow({ card, onOpen }) {
   const { memberById, labelById, colById } = usePlank();
   const { flash } = usePresence();
@@ -57,7 +57,7 @@ function ListRow({ card, onOpen }) {
   );
 }
 
-// ── Group Header ──────────────────────────────────────────────
+
 function GroupHeader({ label, color, count }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, padding: "0 4px" }}>
@@ -68,7 +68,7 @@ function GroupHeader({ label, color, count }) {
   );
 }
 
-// ── List View ─────────────────────────────────────────────────
+
 const SORT_OPTIONS = [
   { id: "due",     label: "Due date" },
   { id: "created", label: "Created" },
@@ -77,13 +77,13 @@ const SORT_OPTIONS = [
 function sortCards(cards, sortBy) {
   return [...cards].sort((a, b) => {
     if (sortBy === "due") {
-      // nulls last
+
       if (!a.due && !b.due) return 0;
       if (!a.due) return 1;
       if (!b.due) return -1;
       return new Date(a.due) - new Date(b.due);
     }
-    // created_at — oldest first
+
     return new Date(a.createdAt ?? 0) - new Date(b.createdAt ?? 0);
   });
 }
@@ -134,7 +134,7 @@ export function ListView({ filterFn, groupBy, onOpen }) {
     <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px 40px" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", display: "flex", flexDirection: "column", gap: 22 }}>
 
-        {/* Sort control */}
+
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ fontSize: 12, color: "var(--text-faint)", fontWeight: 500 }}>Sort:</span>
           {SORT_OPTIONS.map((opt) => (

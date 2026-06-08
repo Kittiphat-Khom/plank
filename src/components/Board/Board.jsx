@@ -8,7 +8,7 @@ import { showToast } from '../../lib/toast';
 import { Icon } from '../Global';
 import { Card } from './Card';
 
-// ── Column Header ─────────────────────────────────────────────
+
 function ColumnHeader({ column, count, wipOver }) {
   return (
     <div className="col__header">
@@ -28,7 +28,7 @@ function ColumnHeader({ column, count, wipOver }) {
   );
 }
 
-// ── Column ────────────────────────────────────────────────────
+
 function Column({ column, cardIds, byId, drag, target, onCardPointerDown, onOpenCard, onAddCard, syncing, flash, typing, canCreate }) {
   const [adding, setAdding] = useState(false);
   const [draft, setDraft]   = useState("");
@@ -112,7 +112,7 @@ function Column({ column, cardIds, byId, drag, target, onCardPointerDown, onOpen
   );
 }
 
-// ── Board ─────────────────────────────────────────────────────
+
 export function Board({ onOpenCard, filterFn }) {
   const { state, COLUMNS, moveCard, addCard, currentUserId } = usePlank();
   const presence = usePresence();

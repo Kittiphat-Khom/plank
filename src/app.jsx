@@ -117,7 +117,6 @@ function Workspace({ onExitGuest }) {
   const plank = usePlank();
   const perms = usePermissions();
 
-  // ── All hooks must be called unconditionally ─────────────
   const [t, setTweak]               = useTweaks(TWEAK_DEFAULTS);
   const [view, setView]             = useState(t.defaultView);
   const [filters, setFilters]       = useState({ assignees: new Set(), labels: new Set(), priority: new Set(), due: "any" });
@@ -131,7 +130,7 @@ function Workspace({ onExitGuest }) {
   const [draftOpen, setDraftOpen]           = useState(false);
   const [shareOpen, setShareOpen]           = useState(false);
   const [toast, setToast]                   = useState(null);
-  const [joinPrompt, setJoinPrompt]         = useState(null); // { projectName, projectId, role, token }
+  const [joinPrompt, setJoinPrompt]         = useState(null);
   const { total: inboxBadge, markRead: markDmRead } = useInboxUnread(plank.currentUserId);
 
   useEffect(() => {
@@ -142,7 +141,6 @@ function Workspace({ onExitGuest }) {
   }, []);
 
   useEffect(() => { applyTheme(t); }, [t.theme, t.density, t.accentHue]);
-  // Signal to PresenceProvider whether user is on a board view
   useEffect(() => { document.documentElement.dataset.view = view; }, [view]);
 
   const filterFn = useMemo(() => buildFilterFn(filters, search), [filters, search]);
@@ -196,7 +194,6 @@ function Workspace({ onExitGuest }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [newCard]);
 
-  // ── Guard: show loading / project setup ──────────────────
   if (plank.projectLoading) {
     return (
       <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
@@ -323,7 +320,6 @@ async function upsertCurrentUser(authUser) {
   const handle = `${authUser.email.split('@')[0].toLowerCase().replace(/[^a-z0-9_]/g, '')}_${authUser.id.slice(0, 4)}`;
   const memberId = `u_${authUser.id.replace(/-/g, '').slice(0, 12)}`;
 
-  // Check if member already exists with a user-set name (has space)
   const { data: existing } = await supabase
     .from('members').select('*').eq('auth_id', authUser.id).single();
 
@@ -351,7 +347,6 @@ async function upsertCurrentUser(authUser) {
 
   if (error) { console.error('upsertCurrentUser:', error); return null; }
 
-  // Auto-accept pending invites for this email
   const { data: invites } = await supabase
     .from('project_invites')
     .select('id, project_id, role')
@@ -373,7 +368,6 @@ async function upsertCurrentUser(authUser) {
 }
 
 export default function App() {
-  // undefined = loading, null = not authed, object = session
   const [session, setSession]           = useState(undefined);
   const [currentUser, setCurrentUser]   = useState(null);
   const [guestMode, setGuestMode]       = useState(false);
@@ -388,7 +382,6 @@ export default function App() {
           setCurrentUser(member);
         } catch (err) {
           console.error('upsertCurrentUser failed:', err);
-          // still let the app render even if upsert fails
         }
       } else {
         setCurrentUser(null);
@@ -405,7 +398,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Handle ?join=TOKEN — show confirmation UI before joining
   useEffect(() => {
     const token = new URLSearchParams(window.location.search).get('join');
     if (!token || !currentUser?.id) return;
@@ -442,7 +434,6 @@ export default function App() {
 
   if (!session && !guestMode) return <AuthPage onContinueAsGuest={() => setGuestMode(true)} />;
 
-  // name has no space = auto-generated from email, prompt user to set real name
   const needsProfile = currentUser && !/\s/.test(currentUser.name.trim());
 
   if (needsProfile) {

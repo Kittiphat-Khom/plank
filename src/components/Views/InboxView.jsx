@@ -3,10 +3,9 @@ import { usePlank } from '../../providers/PlankProvider';
 import { Avatar } from '../Global';
 import { MEMBERS as STATIC_MEMBERS } from '../../config/data';
 
-// IDs of hardcoded bot/seed members — never show these in DM list
+
 const BOT_IDS = new Set(STATIC_MEMBERS.map((m) => m.id));
 
-// ── localStorage helpers ──────────────────────────────────────
 
 function getLastRead(peerId) {
   const val = localStorage.getItem(`plank_dm_read_${peerId}`);
@@ -17,7 +16,6 @@ function markRead(peerId) {
   localStorage.setItem(`plank_dm_read_${peerId}`, new Date().toISOString());
 }
 
-// ── Message bubble ───────────────────────────────────────────
 
 function Bubble({ msg, isMe, memberById, onDelete }) {
   const sender = memberById[msg.from_id];
@@ -70,7 +68,6 @@ function Bubble({ msg, isMe, memberById, onDelete }) {
   );
 }
 
-// ── Thread ───────────────────────────────────────────────────
 
 function Thread({ peer, currentUserId, memberById, onNewMessage }) {
   const [messages, setMessages] = useState([]);
@@ -146,7 +143,7 @@ function Thread({ peer, currentUserId, memberById, onNewMessage }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* Header */}
+
       <div style={{
         display: 'flex', alignItems: 'center', gap: 10,
         padding: '14px 20px', borderBottom: '1px solid var(--border)', flexShrink: 0,
@@ -158,7 +155,7 @@ function Thread({ peer, currentUserId, memberById, onNewMessage }) {
         </div>
       </div>
 
-      {/* Messages */}
+
       <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', color: 'var(--text-faint)', fontSize: 13, paddingTop: 40 }}>Loading…</div>
@@ -174,7 +171,7 @@ function Thread({ peer, currentUserId, memberById, onNewMessage }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
+
       <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', flexShrink: 0 }}>
         <div style={{
           display: 'flex', gap: 8, alignItems: 'center',
@@ -224,7 +221,6 @@ function Thread({ peer, currentUserId, memberById, onNewMessage }) {
   );
 }
 
-// ── Member row ───────────────────────────────────────────────
 
 function MemberRow({ member, active, unread, latestMsg, onClick, onDelete }) {
   const [hovered, setHovered] = useState(false);
@@ -286,7 +282,7 @@ function MemberRow({ member, active, unread, latestMsg, onClick, onDelete }) {
         </div>
       </button>
 
-      {/* Delete conversation button — shows on hover */}
+
       {hovered && onDelete && (
         <button
           onClick={(e) => { e.stopPropagation(); onDelete(member.id); }}
@@ -309,7 +305,6 @@ function MemberRow({ member, active, unread, latestMsg, onClick, onDelete }) {
   );
 }
 
-// ── New DM picker ─────────────────────────────────────────────
 
 function NewDMPicker({ peers, onSelect, onClose }) {
   const [q, setQ] = useState('');
@@ -364,24 +359,23 @@ function NewDMPicker({ peers, onSelect, onClose }) {
   );
 }
 
-// ── InboxView ────────────────────────────────────────────────
 
 export function InboxView({ onMarkRead }) {
   const { MEMBERS, memberById, currentUserId } = usePlank();
   const [peerId, setPeerId] = useState(null);
-  // { [peerId]: { latest: Message | null, unread: number } }
+
   const [convs, setConvs] = useState({});
   const peerIdRef = useRef(null);
   const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => { peerIdRef.current = peerId; }, [peerId]);
 
-  // All real (non-bot) users except self
+
   const allPeers = MEMBERS.filter((m) => m.id !== currentUserId && !BOT_IDS.has(m.id));
-  // Sidebar list: only peers with at least one message
+
   const peers = allPeers.filter((m) => convs[m.id]?.latest);
 
-  // Load all DMs for conversation list
+
   const loadConvs = useCallback(async () => {
     const { supabase } = await import('../../lib/supabase');
     const { data } = await supabase
@@ -403,7 +397,7 @@ export function InboxView({ onMarkRead }) {
     setConvs(map);
   }, [currentUserId]);
 
-  // Subscribe to all new DMs at list level
+
   useEffect(() => {
     loadConvs();
 
@@ -433,7 +427,7 @@ export function InboxView({ onMarkRead }) {
     return () => { sub?.unsubscribe(); };
   }, [currentUserId, loadConvs]);
 
-  // Sort peers: those with messages first (by latest), then rest
+
   const sortedPeers = [...peers].sort((a, b) => {
     const ta = convs[a.id]?.latest?.created_at ?? '';
     const tb = convs[b.id]?.latest?.created_at ?? '';
@@ -468,7 +462,7 @@ export function InboxView({ onMarkRead }) {
 
   return (
     <div style={{ display: 'flex', height: '100%', background: 'var(--bg)', overflow: 'hidden' }}>
-      {/* Member list */}
+
       <div style={{
         width: 260, flexShrink: 0,
         borderRight: '1px solid var(--border)',
@@ -532,7 +526,7 @@ export function InboxView({ onMarkRead }) {
         </div>
       </div>
 
-      {/* Thread */}
+
       <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
         {peer ? (
           <Thread
@@ -541,7 +535,7 @@ export function InboxView({ onMarkRead }) {
             currentUserId={currentUserId}
             memberById={memberById}
             onNewMessage={(msg) => {
-              // Thread already handles display; list subscription handles convs state
+
             }}
           />
         ) : (

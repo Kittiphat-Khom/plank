@@ -22,21 +22,20 @@ export function usePermissions() {
     level: myLevel,
     label: ROLE_LABEL[myRole],
 
-    // Card actions
+
     canCreate: myLevel >= ROLE_LEVEL.member,
     canEdit:   myLevel >= ROLE_LEVEL.member,
     canDelete: myLevel >= ROLE_LEVEL.admin,
 
-    // Member management
+
     canManageMembers: myLevel >= ROLE_LEVEL.admin,
 
-    // Role assignment: can assign roles at or below your own level
-    // Owner is special: can assign any role (including transfer ownership)
+
     canAssignRole: (targetRole) =>
       myLevel >= ROLE_LEVEL.admin &&
       (myRole === 'owner' || ROLE_LEVEL[targetRole] <= myLevel),
 
-    // Assignable roles for the dropdown
+
     assignableRoles: ALL_ROLES.filter(r =>
       myRole === 'owner' || ROLE_LEVEL[r] <= myLevel
     ),

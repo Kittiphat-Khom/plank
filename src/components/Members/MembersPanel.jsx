@@ -4,7 +4,7 @@ import { usePlank } from '../../providers/PlankProvider';
 import { usePermissions, ROLE_LABEL, ROLE_COLOR, ALL_ROLES } from '../../hooks/usePermissions';
 import { Avatar, Icon } from '../Global';
 
-// ── Role Select / Badge ───────────────────────────────────────
+
 function RoleControl({ member, perms, onRoleChange }) {
   const role = member.role || 'member';
   const isMe = member.id === 'u_you';
@@ -32,7 +32,7 @@ function RoleControl({ member, perms, onRoleChange }) {
   );
 }
 
-// ── Member Row ────────────────────────────────────────────────
+
 function MemberRow({ member, perms, onRoleChange }) {
   return (
     <div className="member-row">
@@ -49,7 +49,7 @@ function MemberRow({ member, perms, onRoleChange }) {
   );
 }
 
-// ── Panel ─────────────────────────────────────────────────────
+
 export function MembersPanel({ onClose }) {
   const { MEMBERS, updateMemberRole } = usePlank();
   const perms = usePermissions();
@@ -85,7 +85,7 @@ export function MembersPanel({ onClose }) {
           )}
         </div>
 
-        {/* Role legend */}
+
         <div className="members-panel__legend">
           {ALL_ROLES.map((r) => (
             <div key={r} className="legend-item">
